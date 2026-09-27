@@ -7,8 +7,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#efeae0;--card:#f6f2ea;--ink:#1a1917;--mut:#8a8477;--line:#1a19171f;--acc:#b4532a;--dot:#1a191724}
-@media(prefers-color-scheme:dark){:root{--bg:#121211;--card:#1a1a18;--ink:#ebe5d8;--mut:#7d786d;--line:#ebe5d81c;--acc:#d9774a;--dot:#ebe5d81f}}
+@supports(color:oklch(0 0 0)){:root{--h0:oklch(.87 .018 85);--h1:oklch(.85 .06 150);--h2:oklch(.71 .09 150);--h3:oklch(.55 .1 152);--h4:oklch(.40 .085 155)}}
+:root{--h0:#dcd5c6;--h1:#c2d6b8;--h2:#8fb487;--h3:#5a8a57;--h4:#2f5a33;--bg:#efeae0;--card:#f6f2ea;--ink:#1a1917;--mut:#8a8477;--line:#1a19171f;--acc:#3f6f41;--dot:#1a191724}
+@supports(color:oklch(0 0 0)){@media(prefers-color-scheme:dark){:root{--h0:oklch(.27 .006 85);--h1:oklch(.34 .05 150);--h2:oklch(.47 .08 150);--h3:oklch(.62 .11 150);--h4:oklch(.80 .13 148)}}}
+@media(prefers-color-scheme:dark){:root{--h0:#2a2926;--h1:#28402b;--h2:#3d6a41;--h3:#5f9a5f;--h4:#98cf8f;--bg:#121211;--card:#1a1a18;--ink:#ebe5d8;--mut:#7d786d;--line:#ebe5d81c;--acc:#8fc98a;--dot:#ebe5d81f}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.5 "IBM Plex Mono",ui-monospace,monospace;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -17,7 +19,8 @@ button:hover{border-color:var(--ink)}button:active{transform:scale(.97)}
 .solid{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .lbl{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
 .serif{font-family:"Instrument Serif",Georgia,serif;font-weight:400;letter-spacing:-.01em}
-.wrap{max-width:900px;margin:auto;padding:0 20px 80px}
+.wrap{max-width:1180px;margin:auto;padding:0 clamp(20px,4vw,48px) 80px}
+@media(min-width:1000px){.now{grid-template-columns:1fr 1fr}.home2{display:grid;grid-template-columns:1fr 1fr;gap:48px}.home2 section{margin-top:56px}}
 header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:4px;padding:12px 0;background:var(--bg);box-shadow:0 0 0 100vmax var(--bg);clip-path:inset(0 -100vmax);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:.2s}
 header.sc{border-color:var(--line);clip-path:inset(0 -100vmax -1px)}
 header .mark{font-size:12px;letter-spacing:.32em;flex:1;cursor:pointer;margin-left:6px}
@@ -44,7 +47,7 @@ section{margin-top:56px}
 .hd h2{font-size:28px;margin:0}
 .ledger{overflow-x:auto;scrollbar-width:none;margin:0 -4px}.ledger::-webkit-scrollbar{display:none}
 .ledger svg{display:block;width:100%}
-.ledger g:hover circle{stroke:var(--ink);stroke-width:1}
+.ledger g:hover circle:first-of-type{stroke:var(--ink);stroke-width:1}
 #cap{min-height:20px;margin-top:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .legend{display:flex;align-items:center;gap:6px}
 .now{display:grid;gap:14px}
@@ -60,7 +63,7 @@ section{margin-top:56px}
 .bk{cursor:pointer}.bk .cv{transition:.25s}.bk:hover .cv{transform:translateY(-4px) rotate(-.6deg)}
 .bk .t{margin-top:10px;font-size:16px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .bk.want .cv{opacity:.55;filter:grayscale(.6)}
-.seal{position:absolute;right:6px;bottom:6px;width:20px;height:20px;border-radius:50%;background:var(--acc);color:#fff;font:11px/20px sans-serif;text-align:center}
+.seal{position:absolute;right:6px;bottom:6px;width:20px;height:20px;border-radius:50%;background:var(--acc);color:var(--bg);font:11px/20px sans-serif;text-align:center}
 .empty{border:1px dashed var(--line);border-radius:14px;padding:44px 20px;text-align:center;color:var(--mut)}
 .empty .serif{font-size:26px;color:var(--ink);display:block;margin-bottom:6px}
 dialog{border:0;padding:0;background:var(--card);color:var(--ink);border-radius:18px;width:min(520px,94vw);max-height:90vh;box-shadow:0 30px 80px #0005}
@@ -166,8 +169,8 @@ const emptyH=(t,s)=>`<div class="empty"><span class="serif">${t}</span>${s}<br><
 const srt=(a,b)=>(b.status=='reading')-(a.status=='reading')||(b.finished||'').localeCompare(a.finished||'')||b.upd-a.upd;
 const view_={
  home(){const rd=D.books.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd),fin=D.books.filter(b=>b.status=='finished').sort(srt).slice(0,6);
-  $('#view').innerHTML=heroH()+ledH()+`<section><div class="hd"><h2 class="serif">Reading now</h2>${rd.length>3?`<a class="lbl" style="cursor:pointer" onclick="go('reading')">All ${rd.length} →</a>`:''}</div>${rd.length?`<div class="now">${nowH(rd.slice(0,3))}</div>`:emptyH('Nothing on the go','Search a book and tap Reading.')}</section>`+
-  (fin.length?`<section><div class="hd"><h2 class="serif">Recently finished</h2><a class="lbl" style="cursor:pointer" onclick="go('finished')">All →</a></div>${shelfH(fin)}</section>`:'');ledger()},
+  $('#view').innerHTML=heroH()+ledH()+`<div class="home2"><section><div class="hd"><h2 class="serif">Reading now</h2>${rd.length>3?`<a class="lbl" style="cursor:pointer" onclick="go('reading')">All ${rd.length} →</a>`:''}</div>${rd.length?`<div class="now" style="grid-template-columns:1fr">${nowH(rd.slice(0,3))}</div>`:emptyH('Nothing on the go','Search a book and tap Reading.')}</section>`+
+  (fin.length?`<section><div class="hd"><h2 class="serif">Recently finished</h2><a class="lbl" style="cursor:pointer" onclick="go('finished')">All →</a></div>${shelfH(fin)}</section>`:'')+'</div>';ledger()},
  reading(){const rd=D.books.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd);$('#view').innerHTML=title('Reading now',rd.length+' books')+`<section style="margin-top:28px">${rd.length?`<div class="now">${nowH(rd)}</div>`:emptyH('Nothing on the go','Search a book and tap Reading.')}</section>`},
  library(){const L=D.books.filter(b=>!F||b.status==F).sort(srt),T=[['','All'],['reading','Reading'],['finished','Read'],['want','Want']];
   $('#view').innerHTML=title('Library',D.books.length+' books')+`<div class="tabs lbl" style="margin:22px 0 26px">${T.map(([k,l])=>`<a class="${F==k?'on':''}" onclick="F='${k}';render()">${l}</a>`).join('')}</div>`+(L.length?shelfH(L):emptyH('Nothing here yet','Tap + to add a book.'))},
@@ -183,15 +186,15 @@ function ledger(){const L0=$('#ledger');if(!L0)return;const c=14,W=Math.max(12,M
  const mx=Math.max(30,...Object.values(D.log).map(Number)),t=today();let s='',lm=-1,days=0,tot=0;
  for(let w=0;w<W;w++)for(let r=0;r<7;r++){const d=new Date(start);d.setDate(start.getDate()+w*7+r);if(d>end)break;const k=ds(d),p=pages(k),x=left+w*c+c/2,yy=top+r*c+c/2;
   if(r==0&&d.getMonth()!=lm){lm=d.getMonth();if(w<W-1)s+=`<text x="${x-4}" y="10" class="ml">${MO[lm]}</text>`}
-  if(p){days++;tot+=p}const rad=p?2.6+Math.sqrt(Math.min(p,mx)/mx)*3.6:1.6,f=fin[k];
-  s+=`<g data-k="${k}" data-p="${p}" data-f="${esc((f||[]).join(', '))}"><rect x="${x-7}" y="${yy-7}" width="14" height="14" fill="transparent"/>`+
-   (f?`<circle cx="${x}" cy="${yy}" r="5.8" fill="var(--acc)"/>`:`<circle cx="${x}" cy="${yy}" r="${rad}" fill="${p?'var(--ink)':'var(--dot)'}" ${p?`opacity="${.45+.55*Math.min(1,p/mx)}"`:''}/>`)+
-   (k==t?`<circle cx="${x}" cy="${yy}" r="6.6" fill="none" stroke="var(--acc)" stroke-width="1"/>`:'')+'</g>'}
+  if(p){days++;tot+=p}const lv=p?p<10?1:p<25?2:p<50?3:4:0,f=fin[k];
+  s+=`<g data-k="${k}" data-p="${p}" data-f="${esc((f||[]).join(', '))}"><rect x="${x-7}" y="${yy-7}" width="14" height="14" fill="transparent"/><circle cx="${x}" cy="${yy}" r="${lv?4.6:2.2}" fill="var(--h${lv})"/>`+
+   (f?`<circle cx="${x}" cy="${yy}" r="6.4" fill="none" stroke="var(--ink)" stroke-width="1.3"/>`:'')+
+   (k==t?`<circle cx="${x}" cy="${yy}" r="6.4" fill="none" stroke="var(--mut)" stroke-width="1" stroke-dasharray="2 1.6"/>`:'')+'</g>'}
  s+=['Mon','','Wed','','Fri','',''].map((l,i)=>l?`<text x="0" y="${top+i*c+c/2+3}" class="ml">${l}</text>`:'').join('');
  $('#ledger').innerHTML=`<svg viewBox="0 0 ${left+W*c} ${top+7*c}"><style>.ml{font:9px 'IBM Plex Mono',monospace;fill:var(--mut);letter-spacing:.08em}</style>${s}</svg>`;
  const L=L0;
  $('#lsum').textContent=`${days} days · ${tot.toLocaleString()} pages`;
- const def=`<span>${streak()?'Keep the chain going':'Read a page today to start a streak'}</span><span class="legend">less <svg width="54" height="10">${[1.6,3,4.6,6].map((r,i)=>`<circle cx="${5+i*14}" cy="5" r="${r/1.3}" fill="${i?'var(--ink)':'var(--dot)'}"/>`).join('')}</svg> more <svg width="12" height="10"><circle cx="6" cy="5" r="4" fill="var(--acc)"/></svg> finished</span>`;
+ const def=`<span>${streak()?'Keep the chain going':'Read a page today to start a streak'}</span><span class="legend">0 <svg width="74" height="12">${[0,1,2,3,4].map(i=>`<circle cx="${6+i*15}" cy="6" r="${i?4.6:2.2}" fill="var(--h${i})"/>`).join('')}</svg> 50+ pages <svg width="16" height="14"><circle cx="8" cy="7" r="3.6" fill="var(--h2)"/><circle cx="8" cy="7" r="6" fill="none" stroke="var(--ink)" stroke-width="1.2"/></svg> finished</span>`;
  $('#cap').innerHTML=def;
  L.querySelectorAll('g').forEach(g=>{const h=()=>{const d=new Date(g.dataset.k+'T12:00');$('#cap').innerHTML=`<span>${d.toLocaleDateString('en',{weekday:'short',day:'numeric',month:'short'})} — ${+g.dataset.p?g.dataset.p+' pages':'no reading'}${g.dataset.f?' · finished '+g.dataset.f:''}</span>`};
   g.onmouseenter=h;g.onclick=h;g.onmouseleave=()=>$('#cap').innerHTML=def})}
