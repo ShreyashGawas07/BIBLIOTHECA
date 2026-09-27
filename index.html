@@ -1,148 +1,192 @@
 <!doctype html>
 <html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>My Books</title>
-<meta name="theme-color" content="#2f5d50">
-<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1115">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f4ef;--card:#fff;--ink:#222;--mut:#777;--acc:#2f5d50;--done:#2e8b57;--read:#d98b1c;--want:#8a8f98;--line:#e3dfd6}
-@media(prefers-color-scheme:dark){:root{--bg:#16181b;--card:#22252a;--ink:#eee;--mut:#9aa;--line:#33373d}}
-*{box-sizing:border-box}body{margin:0;font:15px/1.4 system-ui,sans-serif;background:var(--bg);color:var(--ink)}
-header{background:var(--acc);color:#fff;padding:12px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-header h1{font-size:20px;margin:0;flex:1}
-button,select,input{font:inherit;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
-button{cursor:pointer}.pri{background:var(--acc);color:#fff;border:0}header button{background:#ffffff22;color:#fff;border:0}
-main{max-width:1100px;margin:auto;padding:16px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
-.stat{background:var(--card);border-radius:12px;padding:12px;border:1px solid var(--line)}.stat b{font-size:24px;display:block}.stat small{color:var(--mut)}
-.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--done)}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.filters input{flex:1;min-width:150px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
-.book{background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line);cursor:pointer;position:relative}
-.cover{aspect-ratio:2/3;background:#c9c2b3 center/cover;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;color:#333;font-weight:600}
-.book.finished .cover::after{content:"✓ FINISHED";position:absolute;top:8px;left:8px;background:var(--done);color:#fff;font-size:11px;padding:3px 7px;border-radius:6px}
-.book.want .cover{filter:grayscale(.7);opacity:.75}
-.info{padding:8px}.info .t{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.info small{color:var(--mut)}
-.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:5px;background:var(--line);margin-top:4px}
-dialog{border:0;border-radius:14px;background:var(--card);color:var(--ink);width:min(520px,94vw);padding:18px}dialog::backdrop{background:#0008}
-form label{display:block;margin:8px 0 2px;font-size:13px;color:var(--mut)}form input,form select,form textarea{width:100%}
-.row{display:flex;gap:8px}.row>*{flex:1}.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
-.res{display:flex;gap:10px;align-items:center;padding:6px;border-bottom:1px solid var(--line);cursor:pointer}.res img{width:40px}
-.empty{text-align:center;color:var(--mut);padding:40px}
+:root{--bg:#0f1115;--s1:#171a21;--s2:#1f232c;--line:#2a2f3a;--ink:#f2f3f5;--mut:#8b93a3;--acc:#7c9cff;--ok:#3ecf8e;--warn:#f5b041;--r:16px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:15px/1.45 Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:40px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:var(--s2);border-radius:10px;padding:9px 14px;font-weight:500;transition:.15s}
+button:hover{filter:brightness(1.2)}button:active{transform:scale(.97)}
+.pri{background:var(--acc);color:#0b0d12;font-weight:600}.ghost{background:transparent;color:var(--mut)}
+h1,h2{font-family:Fraunces,serif;margin:0}h2{font-size:20px;margin:28px 0 12px}
+.wrap{max-width:1000px;margin:auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 80%,#0f111500);padding:14px 0 10px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:12px}.top h1{flex:1;font-size:24px}
+.sbox{position:relative}
+.sbox input{width:100%;background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px 16px 14px 44px;font-size:16px;outline:none}
+.sbox input:focus{border-color:var(--acc)}
+.sbox::before{content:"";position:absolute;left:16px;top:50%;width:16px;height:16px;transform:translateY(-50%);background:no-repeat center/contain url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%238b93a3" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>')}
+#results{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--s1);border:1px solid var(--line);border-radius:14px;max-height:70vh;overflow:auto;display:none;box-shadow:0 20px 50px #000a}
+#results.on{display:block}
+.res{display:flex;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center}
+.res img,.res .ph{width:46px;height:68px;border-radius:6px;object-fit:cover;background:var(--s2);flex:none}
+.res .m{flex:1;min-width:0}.res .m b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.res small{color:var(--mut)}
+.res .adds{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.res .adds button{padding:5px 10px;font-size:13px}
+.res .have{color:var(--ok);font-size:13px;font-weight:600}
+.msg{padding:18px;text-align:center;color:var(--mut)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+.stat{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.stat b{font-size:22px;display:block}.stat small{color:var(--mut);font-size:12px}
+.ring{height:5px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}.ring i{display:block;height:100%;background:var(--ok);border-radius:3px}
+.now{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.nc{flex:0 0 min(340px,86%);display:flex;gap:14px;background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:14px;scroll-snap-align:start}
+.nc img,.nc .ph{width:84px;height:126px;border-radius:8px;object-fit:cover;flex:none;background:var(--s2);cursor:pointer}
+.nc .m{flex:1;min-width:0;display:flex;flex-direction:column}
+.nc .t{font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.nc small{color:var(--mut)}.nc .p{margin-top:auto}
+.pb{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:6px 0}.pb i{display:block;height:100%;background:var(--acc);border-radius:4px}
+.nc .btns{display:flex;gap:6px}.nc .btns button{flex:1;padding:7px 4px;font-size:13px}
+.tabs{display:flex;gap:6px;margin:28px 0 14px;overflow-x:auto}
+.tabs button{background:transparent;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:7px 14px;white-space:nowrap}
+.tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:18px 14px}
+.bk{cursor:pointer;position:relative}
+.cv{aspect-ratio:2/3;border-radius:10px;background:var(--s2) center/cover;box-shadow:0 6px 18px #0008;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;font-family:Fraunces,serif;font-size:14px;color:var(--mut);transition:.2s}
+.bk:hover .cv{transform:translateY(-3px)}
+.bk.want .cv{filter:saturate(.3) brightness(.7)}
+.bk.finished .cv::after{content:"✓";position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:var(--ok);color:#06140d;font:700 15px/26px Inter;text-align:center;box-shadow:0 2px 8px #0008}
+.bk .mini{position:absolute;left:8px;right:8px;top:calc(100% * 0);}
+.bk .t{font-size:13px;font-weight:600;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bk small{color:var(--mut);font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk .pbar{height:4px;background:var(--line);border-radius:2px;margin-top:6px;overflow:hidden}.bk .pbar i{display:block;height:100%;background:var(--acc)}
+.empty{grid-column:1/-1;text-align:center;color:var(--mut);padding:40px 10px;border:1px dashed var(--line);border-radius:var(--r)}
+dialog{border:0;padding:0;background:var(--s1);color:var(--ink);border-radius:20px;width:min(480px,100vw);max-height:92vh}
+dialog::backdrop{background:#000b;backdrop-filter:blur(4px)}
+@media(max-width:600px){dialog{margin:auto 0 0;width:100vw;max-width:100vw;border-radius:20px 20px 0 0}.stats{grid-template-columns:repeat(2,1fr)}}
+.sh{padding:20px}.sh .hd{display:flex;gap:14px;margin-bottom:16px}.sh .hd img,.sh .hd .ph{width:80px;height:120px;border-radius:8px;object-fit:cover;background:var(--s2);flex:none}
+.sh h3{margin:0 0 4px;font-family:Fraunces,serif;font-size:19px}
+.lbl{font-size:12px;color:var(--mut);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+.seg{display:flex;flex-wrap:wrap;gap:6px}.seg button{background:var(--s2);border:1px solid transparent;padding:7px 12px;font-size:14px}.seg button.on{border-color:var(--acc);color:var(--acc);background:#7c9cff1a}
+.pg{display:flex;gap:8px;align-items:center}.pg input[type=number]{width:80px;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:8px}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.stars button{background:none;font-size:24px;padding:0 3px;color:var(--line)}.stars button.on{color:var(--warn)}
+.fld{width:100%;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.acts{display:flex;gap:8px;margin-top:20px}.acts .sp{flex:1}
+.danger{background:transparent;color:#ff6b6b}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,100px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:600;transition:.3s;z-index:99}
+#toast.on{transform:translate(-50%,0)}
 </style></head><body>
-<header><h1>📚 My Books</h1>
-<button onclick="openEdit()">+ Add</button><button onclick="dlg('search')">Search</button><button onclick="dlg('settings')">⚙</button></header>
-<main>
-<div class="stats" id="stats"></div>
-<div class="filters">
-<input id="q" placeholder="Search my books…" oninput="render()">
-<select id="fs" onchange="render()"><option value="">All status</option><option value="reading">Reading</option><option value="finished">Finished</option><option value="want">Want to read</option><option value="dropped">Dropped</option></select>
-<select id="fsrc" onchange="render()"><option value="">All sources</option></select>
-<select id="sort" onchange="render()"><option value="upd">Recently updated</option><option value="title">Title</option><option value="prog">Progress</option></select>
-</div>
-<div class="grid" id="grid"></div>
+<header><div class="wrap">
+ <div class="top"><h1>My Books</h1><button class="ghost" onclick="openSettings()" aria-label="Settings">⚙︎ Settings</button></div>
+ <div class="sbox"><input id="q" placeholder="Search any book to add it…" autocomplete="off"><div id="results"></div></div>
+</div></header>
+<main class="wrap">
+ <div class="stats" id="stats"></div>
+ <div id="nowWrap"><h2>Currently reading</h2><div class="now" id="now"></div></div>
+ <div class="tabs" id="tabs"></div>
+ <div class="grid" id="grid"></div>
 </main>
 
-<dialog id="edit"><form method="dialog" id="ef">
-<h3 id="etitle">Book</h3>
-<label>Title</label><input name="title" required>
-<label>Author</label><input name="author">
-<div class="row"><div><label>Source</label><select name="source"></select></div>
-<div><label>Status</label><select name="status"><option value="want">Want to read</option><option value="reading">Reading</option><option value="finished">Finished</option><option value="dropped">Dropped</option></select></div></div>
-<div class="row"><div><label>Progress (page / %)</label><input name="cur" type="number" min="0"></div><div><label>Total pages (100 for %)</label><input name="total" type="number" min="0"></div></div>
-<div class="row"><div><label>Started</label><input name="started" type="date"></div><div><label>Finished</label><input name="finished" type="date"></div></div>
-<div class="row"><div><label>Rating</label><select name="rating"><option value="0">–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><div><label>Cover image URL</label><input name="cover"></div></div>
-<label>Notes</label><textarea name="notes" rows="2"></textarea>
-<div class="acts"><button type="button" id="del" onclick="delBook()">Delete</button><button value="cancel" formnovalidate>Cancel</button><button class="pri" value="ok">Save</button></div>
-</form></dialog>
-
-<dialog id="search"><h3>Find a book (Open Library)</h3>
-<div class="row"><input id="olq" placeholder="Title or author" onkeydown="if(event.key=='Enter')ol()"><button class="pri" onclick="ol()" style="flex:0">Go</button></div>
-<div id="olr" style="max-height:50vh;overflow:auto;margin-top:8px"></div>
-<div class="acts"><button onclick="search.close()">Close</button></div></dialog>
-
-<dialog id="settings"><h3>Settings</h3>
-<form id="sf" onsubmit="return false">
-<label>Yearly goal (books)</label><input name="goal" type="number" min="1">
-<label>Daily reading reminder</label><div class="row"><input name="remind" type="time"><button type="button" onclick="askNotif()">Enable notifications</button></div>
-<label>Sources (comma separated)</label><input name="sources">
-</form>
-<label>Backup</label><div class="acts" style="justify-content:flex-start">
-<button onclick="exportJSON()">Export backup</button><button onclick="imp.click()">Import backup / Goodreads CSV</button></div>
-<input type="file" id="imp" accept=".json,.csv" hidden onchange="importFile(this.files[0])">
-<div class="acts"><button class="pri" onclick="saveSettings()">Save</button></div></dialog>
+<dialog id="sheet"><div class="sh" id="shb"></div></dialog>
+<dialog id="settings"><div class="sh">
+ <h3>Settings</h3>
+ <div class="lbl">Books to finish this year</div><input class="fld" id="sGoal" type="number" min="1">
+ <div class="lbl">Daily reminder</div><div class="pg"><input class="fld" id="sRemind" type="time"><button onclick="askNotif()">Allow notifications</button></div>
+ <div class="lbl">Your sources</div><input class="fld" id="sSources">
+ <div class="lbl">Backup</div><div class="seg"><button onclick="exportJSON()">Export backup</button><button onclick="imp.click()">Import backup / Goodreads CSV</button></div>
+ <input type="file" id="imp" accept=".json,.csv" hidden onchange="importFile(this.files[0])">
+ <div class="acts"><span class="sp"></span><button onclick="settings.close()">Cancel</button><button class="pri" onclick="saveSettings()">Save</button></div>
+</div></dialog>
+<div id="toast"></div>
 
 <script>
 const K='mybooks.v1',$=s=>document.querySelector(s);
-let D=JSON.parse(localStorage.getItem(K)||'null')||{books:[],log:{},set:{goal:24,remind:'21:00',sources:'Physical,Kindle,Audible,PDF / eBook,Library,Borrowed,Web / Online'}};
-const save=()=>localStorage.setItem(K,JSON.stringify(D)),today=()=>new Date().toISOString().slice(0,10),esc=s=>String(s??'').replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';');
-let cur=null;
+let D=JSON.parse(localStorage.getItem(K)||'null')||{books:[],log:{},set:{goal:24,remind:'21:00',sources:'Physical,Kindle,Audiobook,PDF / eBook,Library,Borrowed'}};
+D.set.lastSrc??='';let tab='all',cur=null,R=[];
+const save=()=>{localStorage.setItem(K,JSON.stringify(D));render()},today=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const srcs=()=>D.set.sources.split(',').map(s=>s.trim()).filter(Boolean);
 const pct=b=>b.status=='finished'?100:b.total?Math.min(100,Math.round(b.cur/b.total*100)):0;
-
+const img=(u,c='')=>u?`<img src="${esc(u)}" loading="lazy" class="${c}" onerror="this.outerHTML='<div class=ph></div>'">`:'<div class="ph"></div>';
+const key=(t,a)=>(t+'|'+a).toLowerCase().replace(/[^a-z0-9|]/g,'');
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
 function streak(){let n=0,d=new Date();if(!D.log[today()])d.setDate(d.getDate()-1);while(D.log[d.toISOString().slice(0,10)]){n++;d.setDate(d.getDate()-1)}return n}
+
+/* ---------- search: Google Books + Open Library, merged ---------- */
+let st;$('#q').oninput=e=>{clearTimeout(st);const v=e.target.value.trim();if(v.length<2){$('#results').classList.remove('on');return}
+ $('#results').innerHTML='<div class="msg">Searching…</div>';$('#results').classList.add('on');st=setTimeout(()=>search(v),350)};
+document.addEventListener('click',e=>{if(!e.target.closest('.sbox'))$('#results').classList.remove('on')});
+$('#q').onfocus=()=>{if(R.length&&$('#q').value)$('#results').classList.add('on')};
+async function search(q){
+ const g=fetch('https://www.googleapis.com/books/v1/volumes?maxResults=15&printType=books&q='+encodeURIComponent(q)).then(r=>r.json()).then(j=>(j.items||[]).map(i=>{const v=i.volumeInfo;
+  return{title:v.title+(v.subtitle?': '+v.subtitle:''),author:(v.authors||[]).join(', '),total:v.pageCount||0,year:(v.publishedDate||'').slice(0,4),cover:v.imageLinks?(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail).replace('http:','https:').replace('&edge=curl',''):''}})).catch(()=>[]);
+ const o=fetch('https://openlibrary.org/search.json?limit=10&fields=title,author_name,cover_i,number_of_pages_median,first_publish_year&q='+encodeURIComponent(q)).then(r=>r.json()).then(j=>j.docs.map(d=>({title:d.title,author:(d.author_name||[]).join(', '),total:d.number_of_pages_median||0,year:d.first_publish_year||'',cover:d.cover_i?`https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`:''}))).catch(()=>[]);
+ const [a,b]=await Promise.all([g,o]),seen=new Map;
+ for(const x of[...a,...b]){const k=key(x.title,x.author.split(',')[0]);const p=seen.get(k);if(!p)seen.set(k,x);else{p.cover||=x.cover;p.total||=x.total}}
+ R=[...seen.values()].filter(x=>x.title).sort((x,y)=>!!y.cover-!!x.cover).slice(0,20);
+ if(q!==$('#q').value.trim())return;
+ $('#results').innerHTML=R.map((x,i)=>{const have=D.books.find(b=>key(b.title,b.author.split(',')[0])==key(x.title,x.author.split(',')[0]));
+  return`<div class="res">${img(x.cover)}<div class="m"><b>${esc(x.title)}</b><small>${esc(x.author)}${x.year?' · '+x.year:''}${x.total?' · '+x.total+' pages':''}</small>
+  <div class="adds">${have?`<span class="have">✓ In your library</span>`:`<button class="pri" onclick="add(${i},'reading')">📖 Reading</button><button onclick="add(${i},'finished')">✓ Read it</button><button onclick="add(${i},'want')">+ Want</button>`}</div></div></div>`}).join('')||'<div class="msg">No books found. Try another title or author.</div>';
+}
+function add(i,status){const x=R[i],b={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:x.title,author:x.author,cover:x.cover,total:x.total||0,cur:0,rating:0,notes:'',
+ source:D.set.lastSrc||srcs()[0]||'',status,started:status=='reading'?today():'',finished:status=='finished'?today():'',upd:Date.now()};
+ D.books.push(b);if(status!='want')D.log[today()]=1;save();$('#q').value='';$('#results').classList.remove('on');
+ toast(status=='reading'?'Added to Currently reading':status=='finished'?'Marked as read ✓':'Added to Want to read');if(status=='reading')openBook(b.id)}
+
+/* ---------- render ---------- */
 function render(){
- const y=new Date().getFullYear()+'',B=D.books,fin=B.filter(b=>b.status=='finished'),fy=fin.filter(b=>(b.finished||'').startsWith(y)).length,g=+D.set.goal||1;
- $('#stats').innerHTML=`<div class="stat"><b>${fin.length}</b><small>finished of ${B.length} books</small></div>
- <div class="stat"><b>${fy}/${g}</b><small>${y} goal</small><div class="bar"><i style="width:${Math.min(100,fy/g*100)}%"></i></div></div>
- <div class="stat"><b>${B.filter(b=>b.status=='reading').length}</b><small>reading now</small></div>
- <div class="stat"><b>🔥 ${streak()}</b><small>day streak</small></div>
- <div class="stat"><small>${srcs().map(s=>{const t=B.filter(b=>b.source==s);return t.length?`${esc(s)}: ${t.filter(b=>b.status=='finished').length}/${t.length}`:''}).filter(Boolean).join('<br>')||'by source'}</small></div>`;
- const fs=$('#fsrc'),v=fs.value;fs.innerHTML='<option value="">All sources</option>'+srcs().map(s=>`<option>${esc(s)}</option>`).join('');fs.value=v;
- const q=$('#q').value.toLowerCase(),st=$('#fs').value,so=$('#sort').value;
- let L=B.filter(b=>(!st||b.status==st)&&(!fs.value||b.source==fs.value)&&(b.title+' '+b.author).toLowerCase().includes(q));
- L.sort(so=='title'?(a,b)=>a.title.localeCompare(b.title):so=='prog'?(a,b)=>pct(b)-pct(a):(a,b)=>b.upd-a.upd);
- $('#grid').innerHTML=L.map(b=>`<div class="book ${b.status}" onclick="openEdit('${b.id}')">
- <div class="cover" style="${b.cover?`background-image:url('${esc(b.cover)}')`:''}">${b.cover?'':esc(b.title)}</div>
- ${b.status=='reading'?`<div class="bar" style="margin:0;border-radius:0"><i style="width:${pct(b)}%;background:var(--read)"></i></div>`:''}
- <div class="info"><div class="t">${esc(b.title)}</div><small>${esc(b.author)}</small><br>
- <span class="tag">${esc(b.source)}</span> ${b.status=='reading'?`<span class="tag">${pct(b)}%</span>`:''}${b.rating>0?' '+'★'.repeat(b.rating):''}</div></div>`).join('')||'<div class="empty">No books yet. Tap “+ Add” or “Search”.</div>';
+ const y=new Date().getFullYear()+'',B=D.books,fin=B.filter(b=>b.status=='finished'),fy=fin.filter(b=>(b.finished||'').startsWith(y)).length,g=+D.set.goal||1,rd=B.filter(b=>b.status=='reading');
+ $('#stats').innerHTML=`<div class="stat"><b>${fy} <small>/ ${g}</small></b><small>read in ${y}</small><div class="ring"><i style="width:${Math.min(100,fy/g*100)}%"></i></div></div>
+ <div class="stat"><b>${rd.length}</b><small>reading now</small></div><div class="stat"><b>${fin.length}</b><small>finished all-time</small></div><div class="stat"><b>${streak()} 🔥</b><small>day streak</small></div>`;
+ $('#nowWrap').style.display=rd.length?'':'none';
+ $('#now').innerHTML=rd.sort((a,b)=>b.upd-a.upd).map(b=>`<div class="nc">${img(b.cover).replace('<img','<img onclick="openBook(\''+b.id+'\')"')}<div class="m">
+  <div class="t">${esc(b.title)}</div><small>${esc(b.author)}</small>
+  <div class="p"><small>${b.total?`Page ${b.cur} of ${b.total} · `:''}${pct(b)}%</small><div class="pb"><i style="width:${pct(b)}%"></i></div>
+  <div class="btns"><button onclick="bump('${b.id}',10)">+10 pg</button><button onclick="openBook('${b.id}')">Update</button><button onclick="finish('${b.id}')">Done ✓</button></div></div></div></div>`).join('');
+ const T=[['all','All',B.length],['finished','Finished',fin.length],['reading','Reading',rd.length],['want','Want to read',B.filter(b=>b.status=='want').length]];
+ const sc=srcs().filter(s=>B.some(b=>b.source==s));
+ $('#tabs').innerHTML=T.map(([k,l,n])=>`<button class="${tab==k?'on':''}" onclick="tab='${k}';render()">${l} ${n}</button>`).join('')+sc.map(s=>`<button class="${tab=='src:'+s?'on':''}" onclick="tab='src:${esc(s)}';render()">${esc(s)}</button>`).join('');
+ const L=B.filter(b=>tab=='all'||b.status==tab||tab=='src:'+b.source).sort((a,b)=>(b.status=='finished')-(a.status=='finished')||(b.finished||'').localeCompare(a.finished||'')||b.upd-a.upd);
+ $('#grid').innerHTML=L.map(b=>`<div class="bk ${b.status}" onclick="openBook('${b.id}')"><div class="cv" style="${b.cover?`background-image:url('${esc(b.cover)}')`:''}">${b.cover?'':esc(b.title)}</div>
+  ${b.status=='reading'?`<div class="pbar"><i style="width:${pct(b)}%"></i></div>`:''}<div class="t">${esc(b.title)}</div><small>${b.rating?'★'.repeat(b.rating)+' · ':''}${esc(b.author)}</small></div>`).join('')
+  ||`<div class="empty">${B.length?'Nothing here yet.':'Your shelf is empty.<br>Search a book above and tap <b>📖 Reading</b> to add it.'}</div>`;
 }
-function openEdit(id,pre){
- const f=$('#ef');cur=id?D.books.find(b=>b.id==id):null;const b=cur||pre||{status:'want',source:srcs()[0]};
- f.source.innerHTML=srcs().map(s=>`<option>${esc(s)}</option>`).join('');
- for(const k of['title','author','source','status','cur','total','started','finished','rating','cover','notes'])f[k].value=b[k]??'';
- if(!f.rating.value)f.rating.value='0';$('#del').hidden=!cur;$('#etitle').textContent=cur?'Edit book':'Add book';$('#edit').showModal();
-}
-$('#ef').onsubmit=e=>{
- if(e.submitter?.value!='ok')return;const f=e.target,o={};
- for(const k of['title','author','source','status','started','finished','cover','notes'])o[k]=f[k].value.trim();
- for(const k of['cur','total','rating'])o[k]=+f[k].value||0;
- if(o.status=='finished'&&!o.finished)o.finished=today();if(o.status=='reading'&&!o.started)o.started=today();
- if(!cur||o.cur!=cur.cur||o.status!=cur.status)D.log[today()]=1;
- o.upd=Date.now();if(cur)Object.assign(cur,o);else D.books.push({id:crypto.randomUUID?crypto.randomUUID():Date.now()+''+Math.random(),...o});
- save();render();
-};
-function delBook(){if(confirm('Delete this book?')){D.books=D.books.filter(b=>b!==cur);save();render();$('#edit').close()}}
-function dlg(id){if(id=='settings'){const f=$('#sf');for(const k in D.set)f[k].value=D.set[k]}$('#'+id).showModal()}
-async function ol(){
- const r=$('#olr');r.textContent='Searching…';
- try{const j=await(await fetch('https://openlibrary.org/search.json?limit=15&fields=title,author_name,cover_i,number_of_pages_median&q='+encodeURIComponent($('#olq').value))).json();
- window._ol=j.docs;r.innerHTML=j.docs.map((d,i)=>`<div class="res" onclick="pick(${i})">${d.cover_i?`<img src="https://covers.openlibrary.org/b/id/${d.cover_i}-S.jpg">`:''}<div><b>${esc(d.title)}</b><br><small>${esc((d.author_name||[]).join(', '))}</small></div></div>`).join('')||'No results';}catch{r.textContent='Search failed (offline?)'}
-}
-function pick(i){const d=_ol[i];$('#search').close();openEdit(null,{title:d.title,author:(d.author_name||[])[0]||'',total:d.number_of_pages_median||'',cover:d.cover_i?`https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg`:'',status:'want',source:srcs()[0]})}
-function saveSettings(){const f=$('#sf');for(const k in D.set)D.set[k]=f[k].value;save();render();$('#settings').close()}
-function exportJSON(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,1)],{type:'application/json'}));a.download='my-books-'+today()+'.json';a.click()}
+function bump(id,n){const b=D.books.find(x=>x.id==id);b.cur=b.total?Math.min(b.total,b.cur+n):b.cur+n;b.upd=Date.now();D.log[today()]=1;if(b.total&&b.cur>=b.total)return finish(id);save();toast(`Page ${b.cur}`)}
+function finish(id){const b=D.books.find(x=>x.id==id);b.status='finished';b.finished=today();b.cur=b.total;b.upd=Date.now();D.log[today()]=1;save();toast('🎉 Finished “'+b.title+'”');openBook(id)}
+
+/* ---------- book sheet ---------- */
+function openBook(id){cur=D.books.find(b=>b.id==id);drawSheet();if(!$('#sheet').open)$('#sheet').showModal()}
+function drawSheet(){const b=cur,S=[['want','Want to read'],['reading','Reading'],['finished','Finished'],['dropped','Dropped']];
+ $('#shb').innerHTML=`<div class="hd">${img(b.cover)}<div><h3>${esc(b.title)}</h3><small style="color:var(--mut)">${esc(b.author)}</small>
+ <div class="stars" style="margin-top:8px">${[1,2,3,4,5].map(n=>`<button class="${b.rating>=n?'on':''}" onclick="set('rating',${b.rating==n?0:n})">★</button>`).join('')}</div></div></div>
+ <div class="lbl">Status</div><div class="seg">${S.map(([k,l])=>`<button class="${b.status==k?'on':''}" onclick="set('status','${k}')">${l}</button>`).join('')}</div>
+ <div class="lbl">Progress</div><div class="pg"><input type="number" min="0" value="${b.cur}" onchange="set('cur',+this.value)"> of <input type="number" min="0" value="${b.total}" onchange="set('total',+this.value)"> pages</div>
+ ${b.total?`<input type="range" min="0" max="${b.total}" value="${b.cur}" oninput="this.previousElementSibling.children[0].value=this.value" onchange="set('cur',+this.value)">`:''}
+ <div class="lbl">Where I read it</div><div class="seg">${srcs().map(s=>`<button class="${b.source==s?'on':''}" onclick="set('source','${esc(s)}');D.set.lastSrc='${esc(s)}'">${esc(s)}</button>`).join('')}</div>
+ <div class="lbl">Notes</div><textarea class="fld" rows="2" onchange="set('notes',this.value)">${esc(b.notes)}</textarea>
+ <div class="acts"><button class="danger" onclick="del()">Remove</button><span class="sp"></span><button class="pri" onclick="sheet.close()">Done</button></div>`}
+function set(k,v){const b=cur;b[k]=v;b.upd=Date.now();
+ if(k=='status'){if(v=='finished'){b.finished||=today();b.cur=b.total}if(v=='reading')b.started||=today();if(v!='want')D.log[today()]=1}
+ if(k=='cur'){D.log[today()]=1;if(b.total&&v>=b.total&&b.status!='finished'){b.status='finished';b.finished=today();toast('🎉 Finished!')}else if(b.status=='want')b.status='reading'}
+ save();drawSheet()}
+function del(){if(confirm('Remove “'+cur.title+'” from your library?')){D.books=D.books.filter(b=>b!==cur);save();sheet.close()}}
+$('#sheet').onclick=e=>{if(e.target.id=='sheet')sheet.close()};
+
+/* ---------- settings, backup, import ---------- */
+function openSettings(){sGoal.value=D.set.goal;sRemind.value=D.set.remind;sSources.value=D.set.sources;settings.showModal()}
+function saveSettings(){D.set.goal=+sGoal.value||24;D.set.remind=sRemind.value;D.set.sources=sSources.value;save();settings.close();toast('Saved')}
+function exportJSON(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D)],{type:'application/json'}));a.download='my-books-'+today()+'.json';a.click()}
 function csv(t){const R=[];let r=[''],q=0;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c=='"'&&t[i+1]=='"'){r[r.length-1]+='"';i++}else if(c=='"')q=0;else r[r.length-1]+=c}else if(c=='"')q=1;else if(c==',')r.push('');else if(c=='\n'){R.push(r);r=['']}else if(c!='\r')r[r.length-1]+=c}if(r.length>1||r[0])R.push(r);return R}
-async function importFile(file){
- if(!file)return;const t=await file.text();
- if(file.name.endsWith('.json')){if(confirm('Replace all data with this backup?')){D=JSON.parse(t);save();render()}return}
- const [h,...rows]=csv(t),ix=n=>h.indexOf(n);let n=0;
- const sm={read:'finished','currently-reading':'reading','to-read':'want'};
- for(const r of rows){const title=r[ix('Title')];if(!title||D.books.some(b=>b.title==title))continue;
-  const isbn=(r[ix('ISBN13')]||'').replace(/\D/g,'');
-  D.books.push({id:Date.now()+''+n,title,author:r[ix('Author')]||'',source:'Physical',status:sm[r[ix('Exclusive Shelf')]]||'want',cur:0,total:+r[ix('Number of Pages')]||0,rating:+r[ix('My Rating')]||0,finished:(r[ix('Date Read')]||'').replace(/\//g,'-'),started:'',notes:'Imported from Goodreads',cover:isbn?`https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg?default=false`:'',upd:Date.now()-n});n++}
- save();render();alert(n+' books imported from Goodreads');
-}
-// Reminders: fire at the chosen time while the app is open/installed, once per day
-async function askNotif(){const p=await Notification.requestPermission();alert(p=='granted'?'Notifications on':'Notifications blocked in browser settings')}
-function checkRemind(){
- if(!('Notification'in window)||Notification.permission!='granted'||!D.set.remind)return;
- const now=new Date(),hm=now.toTimeString().slice(0,5);if(hm<D.set.remind||localStorage.getItem('remindDay')==today())return;
- localStorage.setItem('remindDay',today());const r=D.books.filter(b=>b.status=='reading');
- const body=D.log[today()]?'Nice, you already read today. A few more pages?':r.length?`Continue "${r[0].title}" (${pct(r[0])}%) and keep your ${streak()}-day streak!`:'Pick your next book from your list!';
- navigator.serviceWorker?.ready.then(s=>s.showNotification('📚 Time to read',{body,icon:'icon.svg'})).catch(()=>new Notification('📚 Time to read',{body}));
-}
+async function importFile(f){if(!f)return;const t=await f.text();
+ if(f.name.endsWith('.json')){if(confirm('Replace all data with this backup?')){D=JSON.parse(t);save();toast('Backup restored')}return}
+ const[h,...rows]=csv(t),ix=n=>h.indexOf(n),sm={read:'finished','currently-reading':'reading','to-read':'want'};let n=0;
+ for(const r of rows){const title=r[ix('Title')];if(!title||D.books.some(b=>b.title==title))continue;const isbn=(r[ix('ISBN13')]||'').replace(/\D/g,'');
+  D.books.push({id:Date.now().toString(36)+n,title,author:r[ix('Author')]||'',source:srcs()[0]||'',status:sm[r[ix('Exclusive Shelf')]]||'want',cur:0,total:+r[ix('Number of Pages')]||0,rating:+r[ix('My Rating')]||0,
+   finished:(r[ix('Date Read')]||'').replace(/\//g,'-'),started:'',notes:'',cover:isbn?`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`:'',upd:Date.now()-n});n++}
+ save();settings.close();toast(n+' books imported')}
+
+/* ---------- reminders ---------- */
+async function askNotif(){if(!('Notification'in window))return toast('Notifications not supported here');toast((await Notification.requestPermission())=='granted'?'Notifications on':'Blocked in browser settings')}
+function checkRemind(){if(!('Notification'in window)||Notification.permission!='granted'||!D.set.remind)return;
+ if(new Date().toTimeString().slice(0,5)<D.set.remind||localStorage.getItem('remindDay')==today())return;localStorage.setItem('remindDay',today());
+ const r=D.books.filter(b=>b.status=='reading')[0],body=D.log[today()]?'You already read today. A few more pages?':r?`Continue “${r.title}” (${pct(r)}%) and keep your ${streak()}-day streak`:'Pick your next book!';
+ navigator.serviceWorker?.ready.then(s=>s.showNotification('📚 Time to read',{body,icon:'icon.svg'})).catch(()=>new Notification('📚 Time to read',{body}))}
 setInterval(checkRemind,60000);document.addEventListener('visibilitychange',checkRemind);
 if('serviceWorker'in navigator&&location.protocol!='file:')navigator.serviceWorker.register('sw.js');
 render();checkRemind();
