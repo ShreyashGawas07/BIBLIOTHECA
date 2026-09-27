@@ -18,11 +18,23 @@ button:hover{border-color:var(--ink)}button:active{transform:scale(.97)}
 .lbl{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
 .serif{font-family:"Instrument Serif",Georgia,serif;font-weight:400;letter-spacing:-.01em}
 .wrap{max-width:900px;margin:auto;padding:0 20px 80px}
-header{display:flex;align-items:center;gap:6px;padding:22px 0 0}
-header .mark{font-size:12px;letter-spacing:.32em;flex:1}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:4px;padding:12px 0;background:var(--bg);box-shadow:0 0 0 100vmax var(--bg);clip-path:inset(0 -100vmax);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:.2s}
+header.sc{border-color:var(--line);clip-path:inset(0 -100vmax -1px)}
+header .mark{font-size:12px;letter-spacing:.32em;flex:1;cursor:pointer;margin-left:6px}
+.drawer{position:fixed;inset:0 auto 0 0;width:290px;max-width:84vw;background:var(--card);z-index:20;transform:translateX(-102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding:18px 14px;box-shadow:20px 0 60px #0000}
+.drawer.on{transform:none;box-shadow:20px 0 60px #0003}
+.scrim{position:fixed;inset:0;background:#1a191755;z-index:15;opacity:0;pointer-events:none;transition:.3s;backdrop-filter:blur(3px)}.scrim.on{opacity:1;pointer-events:auto}
+.drawer .top{display:flex;align-items:center;justify-content:space-between;padding:0 6px 18px;border-bottom:1px solid var(--line);margin-bottom:10px}
+.nav a{display:flex;align-items:center;gap:14px;padding:12px;border-radius:10px;cursor:pointer;font-size:14px}
+.nav a:hover{background:var(--line)}.nav a.on{background:var(--ink);color:var(--bg)}.nav a.on em{color:var(--bg)}
+.nav a em{margin-left:auto;font-style:normal;color:var(--mut);font-size:12px}.nav a svg{flex:none;opacity:.85}
+.nav hr{border:0;border-top:1px solid var(--line);margin:10px 6px}
+.dfoot{margin-top:auto;padding:16px 6px 0;border-top:1px solid var(--line)}.dfoot b{font:400 34px/1 "Instrument Serif",serif}
+.fab{position:fixed;right:20px;bottom:calc(22px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--ink);color:var(--bg);border:0;font-size:26px;line-height:1;box-shadow:0 10px 30px #0004;z-index:6;display:none}
+.vt{font-size:clamp(38px,8vw,56px);margin:28px 0 6px}
 .ib{border:0;width:38px;height:38px;padding:0;display:grid;place-items:center;border-radius:50%}.ib:hover{background:var(--line)}
 section{margin-top:56px}
-.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-top:48px}
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-top:36px}
 .hero h1{font-size:clamp(44px,9vw,76px);line-height:.95;margin:10px 0 0}.hero h1 em{color:var(--mut)}
 .hero .side{text-align:right}.hero .side b{font:400 40px/1 "Instrument Serif",serif;display:block}
 .rule{height:1px;background:var(--line);margin-top:22px;position:relative}.rule i{position:absolute;left:0;top:-1px;height:3px;background:var(--ink);border-radius:2px;transition:width .6s}
@@ -31,7 +43,7 @@ section{margin-top:56px}
 .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;gap:10px}
 .hd h2{font-size:28px;margin:0}
 .ledger{overflow-x:auto;scrollbar-width:none;margin:0 -4px}.ledger::-webkit-scrollbar{display:none}
-.ledger svg{display:block;min-width:720px}
+.ledger svg{display:block;width:100%}
 .ledger g:hover circle{stroke:var(--ink);stroke-width:1}
 #cap{min-height:20px;margin-top:10px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .legend{display:flex;align-items:center;gap:6px}
@@ -54,8 +66,12 @@ section{margin-top:56px}
 dialog{border:0;padding:0;background:var(--card);color:var(--ink);border-radius:18px;width:min(520px,94vw);max-height:90vh;box-shadow:0 30px 80px #0005}
 dialog::backdrop{background:#1a191766;backdrop-filter:blur(6px)}
 dialog[open]{animation:up .25s ease-out}@keyframes up{from{transform:translateY(16px);opacity:0}}
-@media(max-width:600px){dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:18px 18px 0 0}.hero{flex-direction:column;align-items:flex-start}.hero .side{text-align:left}.nc .acts .hide{display:none}.hd{flex-wrap:wrap}.tabs{gap:14px;width:100%}.shelf{grid-template-columns:repeat(3,1fr);gap:22px 12px}.bk .t{font-size:14px}}
+@media(max-width:600px){dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:18px 18px 0 0;max-height:88vh}
+.hero{margin-top:22px;gap:12px}.hero h1{font-size:40px}.hero .side b{font-size:34px}section{margin-top:40px}.hd h2{font-size:24px}.fab{display:block}.hide-m{display:none}
+.nc{padding:12px;gap:14px}.nc .cv{width:52px}.nc .t{font-size:20px}.nc .acts button{padding:8px 12px}.ledger svg{min-width:0}.wrap{padding-bottom:110px}.nc .acts .hide{display:none}.hd{flex-wrap:wrap}.tabs{gap:14px;width:100%}.shelf{grid-template-columns:repeat(3,1fr);gap:22px 12px}.bk .t{font-size:14px}}
 #toast:empty{display:none}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}.kp>div{padding:18px 0;border-bottom:1px solid var(--line)}.kp b{display:block;font-size:34px;margin-top:4px}
+@media(max-width:600px){.kp{grid-template-columns:1fr 1fr}}
 .sh{padding:24px}
 .fld{width:100%;background:transparent;border:0;border-bottom:1px solid var(--line);padding:10px 0;outline:none;border-radius:0}.fld:focus{border-color:var(--ink)}
 select.fld{appearance:none;cursor:pointer}
@@ -73,15 +89,15 @@ input[type=range]{width:100%;accent-color:var(--ink)}
 #toast.on{transform:translate(-50%,0)}
 </style></head><body>
 <div class="wrap">
-<header><span class="mark">BIBLIOTHECA</span>
+<header id="hdr"><button class="ib" onclick="menu(1)" title="Menu" aria-label="Menu"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h14M3 10h14M3 14h9"/></svg></button><span class="mark" onclick="go('home')">BIBLIOTHECA</span>
  <button class="ib" onclick="pal()" title="Add a book ( / )"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="m12.5 12.5 4 4"/></svg></button>
- <button class="ib" onclick="openSet()" title="Settings"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5h14M2 13h14"/><circle cx="6" cy="5" r="2" fill="var(--bg)"/><circle cx="12" cy="13" r="2" fill="var(--bg)"/></svg></button>
+ <button class="ib hide-m" onclick="openSet()" title="Settings"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5h14M2 13h14"/><circle cx="6" cy="5" r="2" fill="var(--bg)"/><circle cx="12" cy="13" r="2" fill="var(--bg)"/></svg></button>
 </header>
-<div id="hero"></div>
-<section><div class="hd"><h2 class="serif">Reading ledger</h2><span class="lbl" id="lsum"></span></div><div class="ledger" id="ledger"></div><div id="cap" class="lbl"></div></section>
-<section id="nowS"><div class="hd"><h2 class="serif">Reading now</h2></div><div class="now" id="now"></div></section>
-<section><div class="hd"><h2 class="serif">Library</h2><div class="tabs lbl" id="tabs"></div></div><div class="shelf" id="shelf"></div></section>
+<main id="view"></main>
 </div>
+<div class="scrim" id="scrim" onclick="menu(0)"></div>
+<aside class="drawer" id="drawer"><div class="top"><span class="mark" style="font-size:12px;letter-spacing:.32em">BIBLIOTHECA</span><button class="ib" onclick="menu(0)" aria-label="Close">✕</button></div><nav class="nav" id="nav"></nav><div class="dfoot" id="dfoot"></div></aside>
+<button class="fab" onclick="pal()" aria-label="Add a book">+</button>
 
 <dialog id="pd"><input id="q" class="fld" placeholder="Search any book…" autocomplete="off"><div id="res"><div class="msg">Title, author or ISBN</div></div></dialog>
 <dialog id="bd"><div class="sh" id="bdb"></div></dialog>
@@ -117,37 +133,63 @@ function setCur(b,v){v=Math.max(0,+v||0);if(b.total)v=Math.min(b.total,v);const 
  if(b.total&&v>=b.total&&b.status!='finished'){b.status='finished';b.finished=today();toast('Finished · '+b.title)}save()}
 function setStatus(b,s){b.status=s;b.upd=Date.now();if(s=='reading')b.started||=today();if(s=='finished'){b.finished||=today();if(b.total){if(b.total>b.cur)D.log[today()]=pages(today())+b.total-b.cur;b.cur=b.total}toast('Finished · '+b.title)}save()}
 
+/* ---------- navigation ---------- */
+let view='home';
+const IC={home:'<path d="M3 9l7-6 7 6v8H3z"/>',reading:'<path d="M2 4h6a2 2 0 0 1 2 2v11a2 2 0 0 0-2-2H2zM18 4h-6a2 2 0 0 0-2 2v11a2 2 0 0 1 2-2h6z"/>',library:'<rect x="3" y="3" width="4" height="14"/><rect x="8" y="3" width="4" height="14"/><path d="m13 4 4 1-3 12-4-1"/>',
+ finished:'<circle cx="10" cy="10" r="7"/><path d="m7 10 2 2 4-4"/>',want:'<path d="M5 3h10v14l-5-4-5 4z"/>',ledger:'<g fill="currentColor" stroke="none"><circle cx="4" cy="5" r="1"/><circle cx="10" cy="5" r="1.8"/><circle cx="16" cy="5" r="1"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1"/><circle cx="16" cy="10" r="2.2"/><circle cx="4" cy="15" r="1"/><circle cx="10" cy="15" r="2.2"/><circle cx="16" cy="15" r="1.8"/></g>',
+ add:'<path d="M10 4v12M4 10h12"/>',set:'<path d="M3 6h14M3 14h14"/><circle cx="7" cy="6" r="2"/><circle cx="13" cy="14" r="2"/>'};
+const ic=k=>`<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4">${IC[k]}</svg>`;
+function menu(o){drawer.classList.toggle('on',!!o);scrim.classList.toggle('on',!!o)}
+function go(v){view=v;menu(0);render();scrollTo({top:0})}
+addEventListener('scroll',()=>hdr.classList.toggle('sc',scrollY>8));
+let lw=innerWidth;addEventListener('resize',()=>{if(Math.abs(innerWidth-lw)>40){lw=innerWidth;render()}});
+
 /* ---------- render ---------- */
-function render(){const bs=D.books,y=new Date().getFullYear(),g=+D.set.goal||1,fy=bs.filter(b=>b.status=='finished'&&(b.finished||'').startsWith(y)).length;
- const doy=(new Date()-new Date(y,0,1))/(864e5*365),st=streak();
- $('#hero').innerHTML=`<div class="hero"><div><span class="lbl">${new Date().toLocaleDateString('en',{weekday:'long',day:'numeric',month:'long'})}</span><h1 class="serif">${fy} <em>of ${g}</em><br>books in ${y}</h1></div>
- <div class="side"><b>${st}</b><span class="lbl">day streak</span></div></div>
+function render(){const bs=D.books,n=s=>bs.filter(b=>b.status==s).length;
+ const N=[['home','Home'],['reading','Reading now',n('reading')],['library','Library',bs.length],['finished','Finished',n('finished')],['want','Want to read',n('want')],['ledger','Reading ledger']];
+ nav.innerHTML=N.map(([k,l,c])=>`<a class="${view==k?'on':''}" onclick="go('${k}')">${ic(k)}${l}${c!=null?`<em>${c}</em>`:''}</a>`).join('')+'<hr>'+
+  `<a onclick="menu(0);pal()">${ic('add')}Add a book<em>/</em></a><a onclick="menu(0);openSet()">${ic('set')}Settings</a>`;
+ dfoot.innerHTML=`<b>${streak()}</b> <span class="lbl">day streak</span><div class="lbl" style="margin-top:6px">${pages(today())} pages today</div>`;
+ view_[view]();}
+const title=(t,sub)=>`<h1 class="serif vt">${t}</h1>${sub?`<div class="lbl">${sub}</div>`:''}`;
+function heroH(){const bs=D.books,y=new Date().getFullYear(),g=+D.set.goal||1,fy=bs.filter(b=>b.status=='finished'&&(b.finished||'').startsWith(y)).length,doy=(new Date()-new Date(y,0,1))/(864e5*365);
+ return`<div class="hero"><div><span class="lbl">${new Date().toLocaleDateString('en',{weekday:'long',day:'numeric',month:'long'})}</span><h1 class="serif">${fy} <em>of ${g}</em><br>books in ${y}</h1></div>
+ <div class="side"><b>${streak()}</b><span class="lbl">day streak</span></div></div>
  <div class="rule"><i style="width:${Math.min(100,fy/g*100)}%"></i><s style="left:${doy*100}%" title="Where you should be today"></s></div>
- <div class="sub lbl"><span>${Math.round(fy/g*100)}% of goal</span><span>${fy>=g*doy?'On pace':Math.ceil(g*doy-fy)+' behind pace'}</span></div>`;
- ledger();
- const rd=bs.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd);$('#nowS').style.display=rd.length?'':'none';
- $('#now').innerHTML=rd.map(b=>`<div class="nc" onclick="openBook('${b.id}')">${cv(b)}<div class="m"><h3 class="t serif">${esc(b.title)}</h3><span class="lbl">${esc(b.author)}</span>
+ <div class="sub lbl"><span>${Math.round(fy/g*100)}% of goal</span><span>${fy>=g*doy?'On pace':Math.ceil(g*doy-fy)+' behind pace'}</span></div>`}
+const ledH=(t='Reading ledger')=>`<section><div class="hd"><h2 class="serif">${t}</h2><span class="lbl" id="lsum"></span></div><div class="ledger" id="ledger"></div><div id="cap" class="lbl"></div></section>`;
+const nowH=rd=>rd.map(b=>`<div class="nc" onclick="openBook('${b.id}')">${cv(b)}<div class="m"><h3 class="t serif">${esc(b.title)}</h3><span class="lbl">${esc(b.author.split(',')[0])}</span>
   <div class="bar"><i style="width:${pct(b)}%"></i></div><span class="lbl">${b.total?`p. ${b.cur} / ${b.total} · `:''}${pct(b)}%</span></div>
   <div class="acts" onclick="event.stopPropagation()"><button onclick="setCur(B('${b.id}'),B('${b.id}').cur+10);toast('+10 pages')">+10</button><button class="hide" onclick="setStatus(B('${b.id}'),'finished')">Done</button></div></div>`).join('');
- const T=[['all','All'],['finished','Read'],['reading','Reading'],['want','Want']];
- $('#tabs').innerHTML=T.map(([k,l])=>`<a class="${tab==k?'on':''}" onclick="tab='${k}';render()">${l} ${k=='all'?bs.length:bs.filter(b=>b.status==k).length}</a>`).join('');
- const L=bs.filter(b=>tab=='all'||b.status==tab).sort((a,b)=>(b.status=='reading')-(a.status=='reading')||(b.finished||'').localeCompare(a.finished||'')||b.upd-a.upd);
- $('#shelf').innerHTML=L.map(b=>`<div class="bk ${b.status}" onclick="openBook('${b.id}')">${cv(b)}<div class="t serif">${esc(b.title)}</div><span class="lbl">${esc(b.author.split(',')[0])}</span></div>`).join('')
-  ||`<div class="empty" style="grid-column:1/-1"><span class="serif">${bs.length?'Nothing here yet':'Your library is empty'}</span>Tap search to add the book you’re reading.<br><br><button class="solid" onclick="pal()">Add a book</button></div>`}
-
+const shelfH=L=>`<div class="shelf">${L.map(b=>`<div class="bk ${b.status}" onclick="openBook('${b.id}')">${cv(b)}<div class="t serif">${esc(b.title)}</div><span class="lbl">${esc(b.author.split(',')[0])}</span></div>`).join('')}</div>`;
+const emptyH=(t,s)=>`<div class="empty"><span class="serif">${t}</span>${s}<br><br><button class="solid" onclick="pal()">Add a book</button></div>`;
+const srt=(a,b)=>(b.status=='reading')-(a.status=='reading')||(b.finished||'').localeCompare(a.finished||'')||b.upd-a.upd;
+const view_={
+ home(){const rd=D.books.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd),fin=D.books.filter(b=>b.status=='finished').sort(srt).slice(0,6);
+  $('#view').innerHTML=heroH()+ledH()+`<section><div class="hd"><h2 class="serif">Reading now</h2>${rd.length>3?`<a class="lbl" style="cursor:pointer" onclick="go('reading')">All ${rd.length} →</a>`:''}</div>${rd.length?`<div class="now">${nowH(rd.slice(0,3))}</div>`:emptyH('Nothing on the go','Search a book and tap Reading.')}</section>`+
+  (fin.length?`<section><div class="hd"><h2 class="serif">Recently finished</h2><a class="lbl" style="cursor:pointer" onclick="go('finished')">All →</a></div>${shelfH(fin)}</section>`:'');ledger()},
+ reading(){const rd=D.books.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd);$('#view').innerHTML=title('Reading now',rd.length+' books')+`<section style="margin-top:28px">${rd.length?`<div class="now">${nowH(rd)}</div>`:emptyH('Nothing on the go','Search a book and tap Reading.')}</section>`},
+ library(){const L=D.books.filter(b=>!F||b.status==F).sort(srt),T=[['','All'],['reading','Reading'],['finished','Read'],['want','Want']];
+  $('#view').innerHTML=title('Library',D.books.length+' books')+`<div class="tabs lbl" style="margin:22px 0 26px">${T.map(([k,l])=>`<a class="${F==k?'on':''}" onclick="F='${k}';render()">${l}</a>`).join('')}</div>`+(L.length?shelfH(L):emptyH('Nothing here yet','Tap + to add a book.'))},
+ finished(){const L=D.books.filter(b=>b.status=='finished').sort(srt);$('#view').innerHTML=title('Finished',L.length+' books read')+`<section style="margin-top:28px">${L.length?shelfH(L):emptyH('No finished books yet','Mark a book as Read and it lands here.')}</section>`},
+ want(){const L=D.books.filter(b=>b.status=='want').sort((a,b)=>b.added-a.added);$('#view').innerHTML=title('Want to read',L.length+' books')+`<section style="margin-top:28px">${L.length?shelfH(L):emptyH('Your wishlist is empty','Search a book and tap Want.')}</section>`},
+ ledger(){const ks=Object.keys(D.log).filter(k=>pages(k)>0).sort();let b=0,c=0,p=null;for(const k of ks){const x=new Date(k+'T12:00');c=p&&(x-p)/864e5<1.5?c+1:1;b=Math.max(b,c);p=x}
+  const tot=ks.reduce((a,k)=>a+pages(k),0),m=ds().slice(0,7),mp=ks.filter(k=>k.startsWith(m)).reduce((a,k)=>a+pages(k),0);
+  $('#view').innerHTML=title('Reading ledger','Your consistency, one dot per day')+ledH('Last 12 months')+`<section><div class="kp">${[['Current streak',streak()+' days'],['Longest streak',b+' days'],['Pages this month',mp.toLocaleString()],['Pages all time',tot.toLocaleString()],['Days read',ks.length],['Avg pages / day',ks.length?Math.round(tot/ks.length):0]].map(([l,v])=>`<div><span class="lbl">${l}</span><b class="serif">${v}</b></div>`).join('')}</div></section>`;ledger()}};
+let F='';
 /* ---------- ledger: ink dots, size = pages, seal = book finished ---------- */
-function ledger(){const W=53,c=14,top=18,left=24,end=new Date(),start=new Date();start.setDate(end.getDate()-(W-1)*7-((end.getDay()+6)%7));
+function ledger(){const L0=$('#ledger');if(!L0)return;const c=14,W=Math.max(12,Math.min(53,Math.floor((L0.clientWidth-24)/c))),top=18,left=24,end=new Date(),start=new Date();start.setDate(end.getDate()-(W-1)*7-((end.getDay()+6)%7));
  const fin={};D.books.forEach(b=>{if(b.status=='finished'&&b.finished)(fin[b.finished]||=[]).push(b.title)});
  const mx=Math.max(30,...Object.values(D.log).map(Number)),t=today();let s='',lm=-1,days=0,tot=0;
  for(let w=0;w<W;w++)for(let r=0;r<7;r++){const d=new Date(start);d.setDate(start.getDate()+w*7+r);if(d>end)break;const k=ds(d),p=pages(k),x=left+w*c+c/2,yy=top+r*c+c/2;
-  if(r==0&&d.getMonth()!=lm){lm=d.getMonth();if(w<W-2)s+=`<text x="${x-4}" y="10" class="ml">${MO[lm]}</text>`}
+  if(r==0&&d.getMonth()!=lm){lm=d.getMonth();if(w<W-1)s+=`<text x="${x-4}" y="10" class="ml">${MO[lm]}</text>`}
   if(p){days++;tot+=p}const rad=p?2.6+Math.sqrt(Math.min(p,mx)/mx)*3.6:1.6,f=fin[k];
   s+=`<g data-k="${k}" data-p="${p}" data-f="${esc((f||[]).join(', '))}"><rect x="${x-7}" y="${yy-7}" width="14" height="14" fill="transparent"/>`+
    (f?`<circle cx="${x}" cy="${yy}" r="5.8" fill="var(--acc)"/>`:`<circle cx="${x}" cy="${yy}" r="${rad}" fill="${p?'var(--ink)':'var(--dot)'}" ${p?`opacity="${.45+.55*Math.min(1,p/mx)}"`:''}/>`)+
    (k==t?`<circle cx="${x}" cy="${yy}" r="6.6" fill="none" stroke="var(--acc)" stroke-width="1"/>`:'')+'</g>'}
  s+=['Mon','','Wed','','Fri','',''].map((l,i)=>l?`<text x="0" y="${top+i*c+c/2+3}" class="ml">${l}</text>`:'').join('');
  $('#ledger').innerHTML=`<svg viewBox="0 0 ${left+W*c} ${top+7*c}"><style>.ml{font:9px 'IBM Plex Mono',monospace;fill:var(--mut);letter-spacing:.08em}</style>${s}</svg>`;
- const L=$('#ledger');L.scrollLeft=L.scrollWidth;
+ const L=L0;
  $('#lsum').textContent=`${days} days · ${tot.toLocaleString()} pages`;
  const def=`<span>${streak()?'Keep the chain going':'Read a page today to start a streak'}</span><span class="legend">less <svg width="54" height="10">${[1.6,3,4.6,6].map((r,i)=>`<circle cx="${5+i*14}" cy="5" r="${r/1.3}" fill="${i?'var(--ink)':'var(--dot)'}"/>`).join('')}</svg> more <svg width="12" height="10"><circle cx="6" cy="5" r="4" fill="var(--acc)"/></svg> finished</span>`;
  $('#cap').innerHTML=def;
@@ -207,7 +249,7 @@ function checkRemind(){if(!('Notification'in window)||Notification.permission!='
  const r=D.books.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd)[0],body=r?`“${r.title}” is ${pct(r)}% done.${streak()?' Keep your '+streak()+'-day streak.':''}`:'Pick your next book.';
  navigator.serviceWorker?.ready.then(s=>s.showNotification('Time to read',{body,icon:'icon.svg'})).catch(()=>new Notification('Time to read',{body}))}
 setInterval(checkRemind,60000);document.addEventListener('visibilitychange',checkRemind);
-document.addEventListener('keydown',e=>{if(e.key=='/'&&!e.target.matches('input,textarea')){e.preventDefault();pal()}});
+document.addEventListener('keydown',e=>{if(e.key=='Escape')menu(0);if(e.key=='/'&&!e.target.matches('input,textarea')){e.preventDefault();pal()}});
 if('serviceWorker'in navigator&&location.protocol!='file:')navigator.serviceWorker.register('sw.js');
 render();checkRemind();
 </script></body></html>
