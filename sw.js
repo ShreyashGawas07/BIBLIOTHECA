@@ -1,4 +1,4 @@
-const C='mybooks-v2';
+const C='mybooks-v3';
 self.oninstall=e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.json','icon.svg'])))};
 self.onactivate=e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!=C).map(x=>caches.delete(x)))));
 self.onfetch=e=>{if(new URL(e.request.url).origin!=location.origin)return;
