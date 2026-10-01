@@ -3,7 +3,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Bibliotheca</title>
 <meta name="theme-color" content="#efeae0" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#121211" media="(prefers-color-scheme: dark)">
-<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
@@ -109,9 +109,17 @@ input[type=range]{width:100%;accent-color:var(--ink)}
  <div class="row"><label><span class="lbl">Yearly goal</span><input class="fld" id="sGoal" type="number" min="1"></label><label><span class="lbl">Reminder</span><input class="fld" id="sRem" type="time"></label></div>
  <label style="display:block;margin-top:18px"><span class="lbl">Sources</span><input class="fld" id="sSrc"></label>
  <label style="display:block;margin-top:18px"><span class="lbl">Google Books API key (optional, for more results)</span><input class="fld" id="sKey" placeholder="Paste a free key from console.cloud.google.com"></label>
- <div class="seg" style="margin-top:24px"><button onclick="askNotif()">Enable notifications</button><button onclick="exportJSON()">Export backup</button><button onclick="imp.click()">Import backup / Goodreads</button></div>
+ <div class="seg" style="margin-top:24px"><button onclick="setupPush()">Phone reminders</button><button onclick="exportJSON()">Export backup</button><button onclick="imp.click()">Import backup / Goodreads</button></div>
  <input type="file" id="imp" accept=".json,.csv" hidden onchange="importFile(this.files[0])">
  <div class="row" style="margin-top:28px;justify-content:flex-end"><span></span><button style="flex:none" onclick="sd.close()">Cancel</button><button class="solid" style="flex:none" onclick="saveSet()">Save</button></div>
+</div></dialog>
+<dialog id="pushd"><div class="sh">
+ <h2 class="serif" style="font-size:30px;margin:0 0 10px">Phone reminders</h2>
+ <p class="m" style="margin:0 0 14px">Reminders are on for this device. One last step so they arrive even when the app is closed:</p>
+ <ol style="padding-left:18px;margin:0 0 14px;line-height:1.7"><li>Tap <b>Copy code</b>.</li><li>Open <a href="https://github.com/ShreyashGawas07/my-books/settings/secrets/actions/new" target="_blank" style="color:var(--ink)">your repo’s secrets page</a>.</li><li>Name it <b>PUSH_CONFIG</b>, paste the code, tap <b>Add secret</b>.</li></ol>
+ <textarea class="fld" id="pcode" rows="3" readonly style="font-size:11px;word-break:break-all"></textarea>
+ <div class="row" style="margin-top:18px;justify-content:flex-end"><span></span><button style="flex:none" onclick="testPush()">Test on this device</button><button class="solid" style="flex:none" onclick="navigator.clipboard.writeText(pcode.value).then(()=>toast('Copied'))">Copy code</button></div>
+ <p class="lbl" style="margin:14px 0 0">Changed your reminder time? Run this again and update the secret.</p>
 </div></dialog>
 <div id="toast"></div>
 
@@ -123,7 +131,9 @@ const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec
 function load(){const d=JSON.parse(localStorage.getItem(K)||'null')||{books:[]};
  d.set={goal:24,remind:'21:00',sources:'Physical,Kindle,Audiobook,PDF,Library',lastSrc:'',...d.set};d.log||={};d.books.forEach(b=>{b.added||=b.upd||Date.now()});return d}
 let D=load(),tab='all',cur=null,R=[];
-const save=()=>{localStorage.setItem(K,JSON.stringify(D));render()};
+const save=()=>{localStorage.setItem(K,JSON.stringify(D));render();snap()};
+/* snapshot for the service worker, so closed-app reminders can be personal */
+function snap(){try{const r=D.books.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd)[0];caches.open('state').then(c=>c.put('state.json',new Response(JSON.stringify({date:today(),pt:pages(today()),st:streak(),title:r?.title||'',pct:r?pct(r):0})))).catch(()=>{})}catch(e){}}
 const B=id=>D.books.find(b=>b.id==id),srcs=()=>D.set.sources.split(',').map(s=>s.trim()).filter(Boolean);
 const pct=b=>b.status=='finished'?100:b.total?Math.min(100,Math.round(b.cur/b.total*100)):0;
 const cv=b=>`<div class="cv" style="${b.cover?`background-image:url('${esc(b.cover)}')`:''}">${b.cover?'':esc(b.title)}${b.status=='finished'?'<span class="seal">✓</span>':''}</div>`;
@@ -251,13 +261,24 @@ async function importFile(f){if(!f)return;const t=await f.text();
  save();sd.close();toast(n+' books imported')}
 
 /* ---------- reminders ---------- */
-async function askNotif(){if(!('Notification'in window))return toast('Not supported on this browser');toast((await Notification.requestPermission())=='granted'?'Reminders on':'Blocked in browser settings')}
-function checkRemind(){if(!('Notification'in window)||Notification.permission!='granted'||!D.set.remind)return;
+const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+async function setupPush(){
+ if(!('serviceWorker'in navigator)||!('PushManager'in window))return toast(/iPhone|iPad/.test(navigator.userAgent)?'On iPhone: Safari → Share → Add to Home Screen, then open it from there':'Push not supported in this browser');
+ if(await Notification.requestPermission()!='granted')return toast('Notifications are blocked in your phone settings');
+ try{const reg=await navigator.serviceWorker.ready,kp=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign']);
+  const pub=await crypto.subtle.exportKey('raw',kp.publicKey),jwk=await crypto.subtle.exportKey('jwk',kp.privateKey);
+  await (await reg.pushManager.getSubscription())?.unsubscribe();
+  const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:pub});
+  const[h,m]=(D.set.remind||'21:00').split(':').map(Number),t=new Date();t.setHours(h,m<15?0:m<45?30:60,0,0);
+  pcode.value=btoa(JSON.stringify({sub:sub.toJSON(),pub:b64u(pub),priv:jwk.d,h:t.getUTCHours(),m:t.getUTCMinutes()}));
+  D.set.push=true;save();sd.close();pushd.showModal()}catch(e){toast('Could not set up: '+e.message)}}
+async function testPush(){snap();(await navigator.serviceWorker.ready).showNotification('Time to read',{body:'Reminders work on this device ✓',icon:'icon-192.png',badge:'icon-192.png'})}
+function checkRemind(){if(!('Notification'in window)||Notification.permission!='granted'||!D.set.remind||D.set.push)return;
  if(new Date().toTimeString().slice(0,5)<D.set.remind||localStorage.getItem('remindDay')==today()||pages(today()))return;localStorage.setItem('remindDay',today());
  const r=D.books.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd)[0],body=r?`“${r.title}” is ${pct(r)}% done.${streak()?' Keep your '+streak()+'-day streak.':''}`:'Pick your next book.';
- navigator.serviceWorker?.ready.then(s=>s.showNotification('Time to read',{body,icon:'icon.svg'})).catch(()=>new Notification('Time to read',{body}))}
+ navigator.serviceWorker?.ready.then(s=>s.showNotification('Time to read',{body,icon:'icon-192.png',tag:'daily'})).catch(()=>new Notification('Time to read',{body}))}
 setInterval(checkRemind,60000);document.addEventListener('visibilitychange',checkRemind);
 document.addEventListener('keydown',e=>{if(e.key=='Escape')menu(0);if(e.key=='/'&&!e.target.matches('input,textarea')){e.preventDefault();pal()}});
 if('serviceWorker'in navigator&&location.protocol!='file:')navigator.serviceWorker.register('sw.js');
-render();checkRemind();
+render();snap();checkRemind();
 </script></body></html>

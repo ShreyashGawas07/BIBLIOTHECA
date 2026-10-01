@@ -1,0 +1,17 @@
+name: Reading reminder
+on:
+  schedule:
+    - cron: '0,30 * * * *'
+  workflow_dispatch:
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-save --silent web-push@3
+      - run: node .github/remind.js
+        env:
+          PUSH_CONFIG: ${{ secrets.PUSH_CONFIG }}
+          FORCE: ${{ github.event_name == 'workflow_dispatch' }}
