@@ -188,7 +188,9 @@ dialog.sheet.closing .sheet-in { animation: sheetDown .18s ease-in forwards; }
 .fld { width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: 10px 0; outline: none; border-radius: 0; font-size: 14px; }
 textarea.fld { resize: vertical; line-height: 1.55; font-family: "Literata", Georgia, serif; font-size: 15px; }
 .fld:focus { border-color: var(--ink); }
-select.fld { min-height: 44px; }
+select.fld { min-height: 44px; cursor: pointer; }
+/* the open list is drawn by the OS; give it the theme's colours so options stay readable */
+select.fld, select.fld option { background-color: var(--card); color: var(--ink); }
 .fld-l { display: grid; gap: 2px; margin: 14px 0; }
 
 /* settings */
