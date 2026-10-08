@@ -43,6 +43,8 @@ export async function openReader(bookId, { onExit }) {
 export async function closeReader(silent) {
   if (!S) return
   const s = S
+  clearTimeout(relocateTimer); relocateTimer = 0
+  savePosition()
   syncProgress(true)
   s.auto?.pause()
   s.view?.close?.()
@@ -132,7 +134,11 @@ async function buildView() {
     }
   }
 
-  if (rec.format === 'pdf') pdfBanner()
+  if (rec.format === 'pdf' && !rec.bannerSeen?.[S.mode]) {
+    pdfBanner()
+    rec.bannerSeen = { ...rec.bannerSeen, [S.mode]: true }
+    db.update('books', rec.id, { bannerSeen: rec.bannerSeen }).catch(() => {})
+  }
 }
 
 async function buildPDF(f) {
@@ -388,13 +394,14 @@ function syncProgress(final) {
   if (!S?.rec.bibId || !S.loc) return
   const page = currentPage()
   if (!page) return
-  if (!bridge.find(S.rec.bibId)) return
+  const bib = bridge.find(S.rec.bibId)
+  if (!bib) return
   const total = totalPages()
-  if (total) bridge.setTotal(S.rec.bibId, total)
+  if (total && !bib.total) bridge.setTotal(S.rec.bibId, total)
   // Only count pages you could plausibly have read since the last sync (max ~1 page / 4 s);
   // anything faster is a jump (link, search, slider) and moves the bookmark without logging.
   const now = Date.now()
-  const before = bridge.find(S.rec.bibId)?.cur ?? 0
+  const before = bib.cur ?? 0
   const plausible = page - before <= (now - S.lastSync) / 4000 + 3
   const added = bridge.progress(S.rec.bibId, page, { log: !S.skipLog && plausible })
   S.skipLog = false
@@ -569,9 +576,18 @@ export async function switchPdfMode() {
   const next = S.mode === 'page' ? 'reflow' : 'page'
   const id = S.rec.id; const onExit = S.onExit
   savePosition()
-  await db.update('books', id, { pdfMode: next, pos: { ...(S.rec.pos ?? {}), [next]: null } })
+  // the other layout's exact position is meaningless after a switch; closeReader saves S.rec.pos again
+  S.rec.pos = { ...(S.rec.pos ?? {}), [next]: null }
+  await db.update('books', id, { pdfMode: next, pos: S.rec.pos })
   await closeReader(true)
-  await openReader(id, { onExit })
+  try {
+    await openReader(id, { onExit })
+  } catch (e) {
+    await db.update('books', id, { pdfMode: next === 'page' ? 'reflow' : 'page' })
+    toast(`Couldn’t switch: ${e.message}`)
+    await openReader(id, { onExit }).catch(() => onExit())
+    return
+  }
   if (page) await goToPage(page)
   $('#banner').hidden = true
   toast(next === 'page' ? 'Page mode' : 'Reflow mode')
@@ -595,12 +611,14 @@ function openTOC() {
 function ctxForNotes() {
   return {
     book: S.rec, view: S.view, highlights: S.highlights,
-    jump: (target, page) => {
+    jump: (target, page, mode) => {
       S.skipLog = true
-      if (!String(target).startsWith('epubcfi(')) return page ? goToPage(page) : null
+      // items saved before layouts were tracked belong to Reflow (PDF) or the book itself
+      const sameLayout = (mode ?? (S.mode === 'page' ? 'reflow' : S.mode)) === S.mode
+      if (!sameLayout || !String(target).startsWith('epubcfi(')) return page ? goToPage(page) : null
       return S.view.goTo(target)
     },
-    here: () => ({ chapter: S.loc?.tocItem?.label?.trim() || '', cfi: S.loc?.cfi, page: currentPage() }),
+    here: () => ({ chapter: S.loc?.tocItem?.label?.trim() || '', cfi: S.loc?.cfi, page: currentPage(), mode: S.mode }),
   }
 }
 

@@ -16,7 +16,7 @@ let tab = 'highlights'
 let filter = ''
 
 /**
- * @param {{ book: any, view: any, jump: (target:string) => Promise<any>, highlights: any, here: () => {chapter:string, cfi:string, page:number|null} }} ctx
+ * @param {{ book: any, view: any, jump: (target:string, page?:number, mode?:string) => Promise<any>, highlights: any, here: () => {chapter:string, cfi:string, page:number|null} }} ctx
  */
 export function openNotebook(ctx, startTab) {
   if (startTab) tab = startTab
@@ -68,7 +68,7 @@ function renderHighlights(ctx, list, hl, root) {
   list.querySelectorAll('[data-go]').forEach(b => b.onclick = async () => {
     const h = hl.find(x => x.id === b.dataset.go)
     close($('#notebook'))
-    await ctx.jump(h.cfi)
+    await ctx.jump(h.cfi, h.page, h.mode)
   })
   list.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
     const h = hl.find(x => x.id === b.dataset.edit)
@@ -111,13 +111,13 @@ function renderNotes(ctx, list, notes, root) {
     const body = form.querySelector('textarea').value.trim()
     if (!body) return
     const kind = form.querySelector('input[name=kind]:checked').value
-    await db.put('notes', { id: db.uid(), bookId: ctx.book.id, kind, body, chapter: here.chapter, page: here.page, cfi: here.cfi, created: Date.now(), updated: Date.now() })
+    await db.put('notes', { id: db.uid(), bookId: ctx.book.id, kind, body, chapter: here.chapter, page: here.page, cfi: here.cfi, mode: here.mode, created: Date.now(), updated: Date.now() })
     toast('Note saved')
     render(ctx, root)
   }
   list.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; render(ctx, root) })
   list.querySelectorAll('[data-go]').forEach(b => b.onclick = async () => {
-    const n = notes.find(x => x.id === b.dataset.go); close($('#notebook')); await ctx.jump(n.cfi)
+    const n = notes.find(x => x.id === b.dataset.go); close($('#notebook')); await ctx.jump(n.cfi, n.page, n.mode)
   })
   list.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
     const n = notes.find(x => x.id === b.dataset.del)

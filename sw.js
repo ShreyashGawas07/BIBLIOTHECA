@@ -1,4 +1,4 @@
-const C='mybooks-v13';
+const C='mybooks-v14';
 self.oninstall=e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.json','icon.svg','icon-192.png',
  // reader shell, so it opens offline; vendor files are cached on first use
  'reader/','reader/index.html','reader/css/app.css','reader/js/app.js','reader/js/db.js','reader/js/bridge.js','reader/js/settings.js','reader/js/formats.js','reader/js/ui.js',

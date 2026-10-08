@@ -7,7 +7,7 @@ import { detect, checkDRM, fingerprint, thumbnail, LABEL, SUPPORTED, ReaderError
 import { $, $$, esc, icon, toast, sheet, close, fmtBytes, fmtDate, download } from './ui.js'
 
 let books = []
-let coverURLs = new Map()
+let coverURLs = []
 let reader // lazy-loaded reader module
 let pendingBib = null // Bibliotheca book id we are importing a file for
 
@@ -23,6 +23,7 @@ async function init() {
   $('#more').onclick = openStorage
   $('#file').accept = SUPPORTED
   $('#file').onchange = e => { importFiles([...e.target.files]); e.target.value = '' }
+  $('#file').addEventListener('cancel', () => { pendingBib = null })
   setupDrop()
   // opened straight into a book: don't flash the library first
   if (/^#\/read\//.test(location.hash)) { document.body.classList.add('reading'); $('#reader').hidden = false }
@@ -74,6 +75,8 @@ async function openBook(id) {
   } catch (e) {
     console.error(e)
     history.replaceState(null, '', '#/')
+    document.body.classList.remove('reading')
+    $('#reader').hidden = true
     showError(e)
     refresh()
   }
@@ -89,8 +92,8 @@ function showError(e) {
 
 // ---------- library ----------
 function renderLibrary() {
-  for (const u of coverURLs.values()) URL.revokeObjectURL(u)
-  coverURLs = new Map()
+  for (const u of coverURLs) URL.revokeObjectURL(u)
+  coverURLs = []
   const main = $('#lib')
   if (!books.length) {
     main.innerHTML = `<div class="drop" id="drop-empty">
@@ -127,7 +130,7 @@ function renderLibrary() {
 const HUES = ['#4d6b52', '#6b4d4d', '#4d5a6b', '#6b604d', '#5c4d6b', '#3f5f5f', '#6b4d60']
 function cover(b) {
   if (b.cover) {
-    const u = URL.createObjectURL(b.cover); coverURLs.set(b.id, u)
+    const u = URL.createObjectURL(b.cover); coverURLs.push(u)
     return `<span class="cv"><img src="${u}" alt="" loading="lazy"></span>`
   }
   let h = 0; for (const c of b.title) h = (h * 31 + c.charCodeAt(0)) >>> 0
@@ -222,6 +225,7 @@ async function importOne(file, status) {
   const rec = { id, title, author, format, size: file.size, fp, cover: coverBlob, added: Date.now(), lastOpened: 0, fraction: 0, pos: {}, bibId: null }
   await db.put('files', { id, name: file.name, blob: file })
   await db.put('books', rec)
+  books.push(rec)
   linkTo(rec, pendingBib ?? autoLink(rec, pages))
   pendingBib = null
   return rec
