@@ -16,13 +16,13 @@ Then open `http://localhost:8765/reader/`. Use a server, not `file://`: ES modul
 
 ## Deploy
 
-The reader deploys with Bibliotheca. Commit and push to `main`, and GitHub Pages serves it at `https://shreyashgawas07.github.io/my-books/reader/`.
+The reader deploys with Bibliotheca. Commit and push to `main`, and GitHub Pages serves it at `https://shreyashgawas07.github.io/BIBLIOTHECA/reader/`.
 
 After changing any reader file, bump the cache name in `../sw.js` (`mybooks-vN`) so installed apps pick up the new version.
 
 ## On your Android phone
 
-1. Open `…/my-books/` in Chrome, then open the menu and choose **Install app** (or **Add to Home screen**).
+1. Open `…/BIBLIOTHECA/` in Chrome, then open the menu and choose **Install app** (or **Add to Home screen**).
 2. Launch from the home screen. The browser's address bar is gone.
 3. In a book, tap the centre of the page, then tap the **full-screen** button in the bottom bar. This hides Android's status bar (time, battery) too. Portrait lock takes effect in full screen.
 

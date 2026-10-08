@@ -199,7 +199,7 @@ select.fld, select.fld option { background-color: var(--card); color: var(--ink)
 .sw span { font: 20px/1 "Literata", Georgia, serif; }
 .sw.on { outline: 2px solid var(--acc); outline-offset: 2px; }
 .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); min-height: 56px; }
-.set-row > .lbl { flex: none; width: 64px; }
+.set-row > .lbl { flex: none; min-width: 64px; white-space: nowrap; }
 .seg { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
 .seg button { min-height: 40px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: none; display: inline-flex; align-items: center; gap: 6px; }
 .seg button.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }

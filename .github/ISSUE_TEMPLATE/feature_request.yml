@@ -1,0 +1,25 @@
+name: Feature idea
+description: Suggest something that would make reading better
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the moment while reading where you wished this existed.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+    validations:
+      required: true
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Fits the project
+      options:
+        - label: It keeps everything on the device (no accounts, tracking, or uploading books/notes)
+          required: true
+        - label: I'd like to help build it

@@ -1,0 +1,43 @@
+name: Bug report
+description: Something doesn't work the way it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping make Bibliotheca better. Please don't attach copyrighted books; describe the file or share a small sample you made yourself.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Import a two-column PDF
+        2. Open it in Reflow mode
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [Reader – EPUB/MOBI/other books, Reader – PDF, Highlights & notes, Auto-scroll / zoom / locks, Library & import, Bibliotheca tracker, Offline / install, Other]
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      placeholder: Pixel 7, Chrome 150 (installed app)
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or console errors
+      description: Optional, but very helpful.
