@@ -131,7 +131,13 @@ const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec
 function load(){const d=JSON.parse(localStorage.getItem(K)||'null')||{books:[]};
  d.set={goal:24,remind:'21:00',sources:'Physical,Kindle,Audiobook,PDF,Library',lastSrc:'',...d.set};d.log||={};d.books.forEach(b=>{b.added||=b.upd||Date.now()});return d}
 let D=load(),tab='all',cur=null,R=[];
-const save=()=>{localStorage.setItem(K,JSON.stringify(D));render();snap()};
+let raw=localStorage.getItem(K);
+const save=()=>{localStorage.setItem(K,raw=JSON.stringify(D));render();snap()};
+/* the reader (reader/) writes progress to the same storage; pick it up when we come back */
+function reload(){const r=localStorage.getItem(K);if(r==raw)return;raw=r;D=load();render();if(cur&&bd.open){cur=B(cur.id);if(!cur)bd.close();else if(!bd.contains(document.activeElement))draw()}}
+addEventListener('storage',e=>{if(e.key==K)reload()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible')reload()});
+addEventListener('pageshow',e=>{if(e.persisted)reload()});
 /* snapshot for the service worker, so closed-app reminders can be personal */
 function snap(){try{const r=D.books.filter(b=>b.status=='reading').sort((a,b)=>b.upd-a.upd)[0];caches.open('state').then(c=>c.put('state.json',new Response(JSON.stringify({date:today(),pt:pages(today()),st:streak(),title:r?.title||'',pct:r?pct(r):0})))).catch(()=>{})}catch(e){}}
 const B=id=>D.books.find(b=>b.id==id),srcs=()=>D.set.sources.split(',').map(s=>s.trim()).filter(Boolean);
@@ -162,7 +168,7 @@ let lw=innerWidth;addEventListener('resize',()=>{if(Math.abs(innerWidth-lw)>40){
 function render(){const bs=D.books,n=s=>bs.filter(b=>b.status==s).length;
  const N=[['home','Home'],['reading','Reading now',n('reading')],['library','Library',bs.length],['finished','Finished',n('finished')],['want','Want to read',n('want')],['ledger','Reading ledger']];
  nav.innerHTML=N.map(([k,l,c])=>`<a class="${view==k?'on':''}" onclick="go('${k}')">${ic(k)}${l}${c!=null?`<em>${c}</em>`:''}</a>`).join('')+'<hr>'+
-  `<a onclick="menu(0);pal()">${ic('add')}Add a book<em>/</em></a><a onclick="menu(0);openSet()">${ic('set')}Settings</a>`;
+  `<a href="reader/">${ic('reading')}Reader<em>→</em></a><a onclick="menu(0);pal()">${ic('add')}Add a book<em>/</em></a><a onclick="menu(0);openSet()">${ic('set')}Settings</a>`;
  dfoot.innerHTML=`<b>${streak()}</b> <span class="lbl">day streak</span><div class="lbl" style="margin-top:6px">${pages(today())} pages today</div>`;
  view_[view]();}
 const title=(t,sub)=>`<h1 class="serif vt">${t}</h1>${sub?`<div class="lbl">${sub}</div>`:''}`;
@@ -221,6 +227,7 @@ function draw(){const b=cur,S=[['want','Want'],['reading','Reading'],['finished'
  <div class="row" style="margin-top:14px"><label><span class="lbl">Source</span><select class="fld" onchange="cur.source=D.set.lastSrc=this.value;save()">${[...new Set([...srcs(),b.source].filter(Boolean))].map(s=>`<option ${b.source==s?'selected':''}>${esc(s)}</option>`).join('')}</select></label>
  <label><span class="lbl">Finished</span><input class="fld" type="date" value="${b.finished||''}" onchange="cur.finished=this.value;save()"></label></div>
  <label style="display:block;margin-top:14px"><span class="lbl">Notes</span><textarea class="fld" rows="2" onchange="cur.notes=this.value;save()">${esc(b.notes)}</textarea></label>
+ <button class="solid" style="width:100%;margin-top:20px;padding:12px" onclick="location.href='reader/#/open?bib='+encodeURIComponent(cur.id)">Read in Reader</button>
  <div class="row" style="margin-top:22px"><button style="flex:none;border:0;color:var(--mut)" onclick="if(confirm('Remove this book?')){D.books=D.books.filter(x=>x!=cur);save();bd.close()}">Remove</button><span></span><button class="solid" style="flex:none" onclick="bd.close()">Done</button></div>`}
 for(const d of[pd,bd,sd])d.addEventListener('click',e=>{if(e.target==d)d.close()});
 

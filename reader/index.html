@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- Books can contain scripts; this policy blocks them (blob: book pages inherit it). No network calls leave this site. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' blob:; img-src 'self' blob: data:; font-src 'self' blob: data:; media-src 'self' blob: data:; frame-src blob:; connect-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Reader · Bibliotheca</title>
+<meta name="description" content="A quiet reader for your own books, linked to Bibliotheca.">
+<meta name="theme-color" content="#efeae0">
+<link rel="manifest" href="../manifest.json">
+<link rel="icon" href="../icon.svg">
+<link rel="stylesheet" href="css/app.css">
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<a class="skip" href="#lib">Skip to library</a>
+
+<div id="library">
+  <header class="top">
+    <a class="back-bib" id="to-bib" href="../" aria-label="Back to Bibliotheca"><span class="mark">BIBLIOTHECA</span></a>
+    <span class="mark sub">READER</span>
+    <span class="grow"></span>
+    <button type="button" class="ib" id="add" aria-label="Add books"></button>
+    <button type="button" class="ib" id="more" aria-label="Storage and backup"></button>
+  </header>
+  <main id="lib" class="wrap" tabindex="-1"></main>
+  <div id="imports" hidden aria-live="polite"></div>
+  <input type="file" id="file" multiple hidden>
+  <div class="dropveil" aria-hidden="true"><span class="serif">Drop to add</span></div>
+</div>
+
+<section id="reader" hidden aria-label="Reader">
+  <div id="stage"></div>
+  <div id="chrome-top" class="chrome top" role="toolbar" aria-label="Book controls"></div>
+  <div id="chrome-bot" class="chrome bot"></div>
+  <div id="banner" hidden role="status"></div>
+  <div id="selbar" hidden></div>
+  <div id="loading" hidden role="status" aria-live="polite"><div class="ld"><span class="serif" id="ld-t"></span><span class="p"><i id="ld-p"></i></span></div></div>
+</section>
+
+<dialog id="hl-edit" class="sheet right" aria-labelledby="hl-edit-t">
+  <div class="sheet-in"><div class="grab" aria-hidden="true"></div>
+    <header class="sheet-h"><h2 id="hl-edit-t" class="serif">Highlight</h2><button type="button" class="ib" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg></button></header>
+    <div class="sheet-b hl-body"></div>
+  </div>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

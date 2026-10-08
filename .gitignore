@@ -1,0 +1,7 @@
+# local tooling and test files
+.claude/
+# never publish book files
+*.pdf
+*.epub
+*.mobi
+*.azw3
