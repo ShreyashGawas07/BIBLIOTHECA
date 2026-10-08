@@ -131,6 +131,29 @@ export async function initHighlights(ctx) {
       if (!H || !reg) return
       if (range) reg.set('pen', new H(range)); else reg.delete('pen')
     }
+    // eraser: every highlight the finger passes over is removed
+    let rub = null
+    const erase = e => {
+      const c = caretAt(doc, e.clientX, e.clientY)
+      if (!c) return
+      rub = rub.filter(({ h, r }) => {
+        let hit = false
+        try { hit = r.isPointInRange(c.node, c.offset) } catch {}
+        if (hit) { lastStroke = Date.now(); remove(h.id) }
+        return !hit
+      })
+    }
+    doc.addEventListener('pointerdown', e => {
+      if (!penOn || tool !== 'eraser' || e.button > 0 || !e.isPrimary) return
+      rub = items.filter(h => h.index === index && drawable(h)).flatMap(h => {
+        try { return [{ h, r: view.resolveCFI(h.cfi).anchor(doc) }] } catch { return [] }
+      })
+      erase(e)
+    })
+    doc.addEventListener('pointermove', e => { if (rub && penOn) erase(e) })
+    doc.addEventListener('pointerup', () => { rub = null })
+    doc.addEventListener('pointercancel', () => { rub = null })
+
     doc.addEventListener('pointerdown', e => {
       if (!penOn || tool !== 'pen' || e.button > 0 || !e.isPrimary) return
       start = caretAt(doc, e.clientX, e.clientY); range = null
@@ -164,7 +187,7 @@ export async function initHighlights(ctx) {
     pen.innerHTML = `${penOn ? `<div class="pen-opts" role="group" aria-label="Pen colour and style">
         ${Object.entries(COLORS).map(([k, c]) => `<button type="button" class="dot ${tool === 'pen' && p.hlColor === k ? 'on' : ''}" data-c="${k}" style="--c:${c.hex}" aria-label="${c.label}" aria-pressed="${tool === 'pen' && p.hlColor === k}"></button>`).join('')}
         <span class="sep" aria-hidden="true"></span>
-        <button type="button" class="ib ${tool === 'eraser' ? 'on' : ''}" data-e aria-pressed="${tool === 'eraser'}" aria-label="Eraser: tap a highlight to remove it">${icon('eraser')}</button>
+        <button type="button" class="ib ${tool === 'eraser' ? 'on' : ''}" data-e aria-pressed="${tool === 'eraser'}" aria-label="Eraser: tap or drag over highlights to remove them">${icon('eraser')}</button>
         <button type="button" class="ib sty" data-s aria-label="Style: ${STYLES[p.hlStyle].label}. Tap to change">${styleGlyph(p.hlStyle)}</button>
       </div>` : ''}
       <button type="button" class="pen-btn" data-pen aria-pressed="${penOn}" aria-label="${penOn ? 'Pen on: drag over text to highlight. Tap to turn off' : 'Highlight pen'}" style="--c:${COLORS[p.hlColor].hex}">${icon('pen', 22)}</button>`
