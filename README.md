@@ -41,7 +41,7 @@ Tap the middle of the page and the controls slide in. Leave them alone for three
 
 Press **Auto-scroll** and the text glides upward at the pace you choose, from a slow drift to a brisk read. Put a finger on the screen and it waits for you. Lift it, and it carries on.
 
-Pinch to zoom, then tap the lock, and it stays exactly where you set it, even while it scrolls. Lock the screen to portrait. Go full screen and even the status bar disappears.
+Pinch to zoom, and the page follows your fingers. Tap the lock, and it stays exactly where you set it, even while it scrolls. Lock the screen to portrait. Go full screen and even the status bar disappears.
 
 ## Every book. One feeling.
 
@@ -67,7 +67,7 @@ Want the original page? One tap. Scanned book with no text? It notices, and show
   <img src="docs/assets/notebook.png" alt="Highlighting with one tap of a colour, the notebook listing highlights by chapter, and typed notes such as Key idea and Question" width="860">
 </p>
 
-Select a sentence. Tap a colour. That's it, it's saved. Four colours, three styles: highlight, underline, squiggle.
+Tap the pencil, then drag your finger over a sentence. That's it, it's saved, with no browser menus popping up over the page. Four colours, three styles: highlight, underline, squiggle. Or select text the usual way and tap a colour.
 
 Every book gets its own **notebook**. Highlights are gathered by chapter. Your notes are typed, *Key idea*, *Learning*, *Question*, *To apply*, *Summary*, and each one remembers the page you were on. Tap any of them and you're back in the book, at that exact sentence. Export everything to Markdown whenever you like.
 

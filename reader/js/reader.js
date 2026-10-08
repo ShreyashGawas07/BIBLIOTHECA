@@ -47,6 +47,7 @@ export async function closeReader(silent) {
   savePosition()
   syncProgress(true)
   s.auto?.pause()
+  s.highlights?.destroy()
   s.view?.close?.()
   s.view?.remove()
   s.book?.destroy?.()
@@ -224,15 +225,11 @@ function onLoad({ detail: { doc, index } }) {
   // pinch and Ctrl+wheel zoom are handled here (the browser's own zoom is off while reading)
   doc.documentElement.style.touchAction = 'pan-x pan-y'
   let pinch = null
-  const dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
-  doc.addEventListener('touchstart', e => { if (e.touches.length === 2) pinch = { d0: dist(e.touches), d: dist(e.touches) } }, { passive: true })
-  doc.addEventListener('touchmove', e => { if (pinch && e.touches.length === 2) { e.preventDefault(); pinch.d = dist(e.touches) } }, { passive: false })
-  doc.addEventListener('touchend', e => {
-    if (!pinch || e.touches.length) return
-    const ratio = pinch.d / pinch.d0
-    pinch = null
-    if (Math.abs(ratio - 1) > .08) zoomBy(ratio)
-  })
+  doc.addEventListener('touchstart', e => { if (e.touches.length === 2 && S) pinch = startPinch(doc, e.touches) }, { passive: true })
+  doc.addEventListener('touchmove', e => { if (pinch && e.touches.length === 2) { e.preventDefault(); movePinch(pinch, e.touches) } }, { passive: false })
+  const done = e => { if (pinch && !e.touches.length) { endPinch(pinch, e.type === 'touchcancel'); pinch = null } }
+  doc.addEventListener('touchend', done)
+  doc.addEventListener('touchcancel', done)
   doc.addEventListener('wheel', e => {
     if (!e.ctrlKey) return
     e.preventDefault()
@@ -243,6 +240,56 @@ function onLoad({ detail: { doc, index } }) {
 // Zoom = page scale for original PDF/comic pages, text size for everything else.
 const MAX_PAGE_ZOOM = 4
 const zoomValue = () => S.view.isFixedLayout ? (S.rec.pageZoom || 1) : prefs.get().size
+
+// Pinch follows the fingers live: the renderer is scaled with a CSS transform around the point
+// between them (and moves with them), then the real zoom is applied once, keeping that point still.
+function startPinch(doc, touches) {
+  if (prefs.get().zoomLock) return { locked: true }
+  const el = S.view.renderer, frame = doc.defaultView.frameElement
+  const fr = frame.getBoundingClientRect()
+  const k = fr.width / (doc.defaultView.innerWidth || fr.width) // iframe drawn scaled (comics)
+  const [lo, hi] = S.view.isFixedLayout ? [1, MAX_PAGE_ZOOM] : [13, 32]
+  const v = zoomValue()
+  const p = { el, frame, fr, k, E0: el.getBoundingClientRect(), t: [0, 0], r: 1, rMin: lo / v, rMax: hi / v }
+  const [a, b] = pinchPts(p, touches)
+  p.m0 = p.m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
+  p.d0 = Math.hypot(a[0] - b[0], a[1] - b[1]) || 1
+  el.style.transformOrigin = '0 0'
+  el.style.willChange = 'transform'
+  return p
+}
+// finger positions in page coordinates, undoing the preview transform that is on screen
+function pinchPts(p, touches) {
+  return [touches[0], touches[1]].map(t => {
+    const q = [p.fr.left + t.clientX * p.k, p.fr.top + t.clientY * p.k]
+    return [0, 1].map(i => p.E0[i ? 'top' : 'left'] + p.t[i] + p.r * (q[i] - p.E0[i ? 'top' : 'left']))
+  })
+}
+function movePinch(p, touches) {
+  if (p.locked) return
+  const [a, b] = pinchPts(p, touches)
+  const r = Math.min(p.rMax, Math.max(p.rMin, Math.hypot(a[0] - b[0], a[1] - b[1]) / p.d0))
+  p.m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
+  p.r = r
+  // keep the content point first under the fingers under their current midpoint
+  p.t = [0, 1].map(i => { const o = p.E0[i ? 'top' : 'left']; return (p.m[i] - o) - r * (p.m0[i] - o) })
+  p.el.style.transform = `translate(${p.t[0]}px, ${p.t[1]}px) scale(${r})`
+}
+function endPinch(p, cancelled) {
+  if (p.locked) { toast('Zoom is locked. Tap the lock to change it.'); return }
+  const { el, frame } = p
+  el.style.transform = el.style.transformOrigin = el.style.willChange = ''
+  if (!S || cancelled || Math.abs(p.r - 1) < .02) return
+  if (S.view.isFixedLayout) {
+    const f0 = frame.getBoundingClientRect()
+    const fx = (p.m0[0] - f0.left) / f0.width, fy = (p.m0[1] - f0.top) / f0.height
+    setPageZoom((S.rec.pageZoom || 1) * p.r)
+    const f1 = frame.getBoundingClientRect()
+    el.scrollLeft += f1.left + fx * f1.width - p.m[0]
+    el.scrollTop += f1.top + fy * f1.height - p.m[1]
+    renderZoom()
+  } else zoomBy(p.r)
+}
 function zoomBy(ratio) {
   if (!S) return
   if (prefs.get().zoomLock) { toast('Zoom is locked. Tap the lock to change it.'); return }

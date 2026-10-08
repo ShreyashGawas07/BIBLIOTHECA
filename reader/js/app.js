@@ -42,6 +42,7 @@ async function refresh() {
       if (b.bibId) bridge.retitle(b.bibId, b.title, c.title, c.author)
       Object.assign(b, c); db.update('books', b.id, c)
     }
+    shareCover(b)
   }
   renderLibrary()
 }
@@ -133,6 +134,9 @@ function cover(b) {
     const u = URL.createObjectURL(b.cover); coverURLs.push(u)
     return `<span class="cv"><img src="${u}" alt="" loading="lazy"></span>`
   }
+  // no cover in the file: use the one Bibliotheca found when you searched for the book
+  const bc = b.bibId && bridge.find(b.bibId)?.cover
+  if (bc && /^(https:|data:image\/)/.test(bc)) return `<span class="cv"><img src="${esc(bc)}" alt="" loading="lazy"></span>`
   let h = 0; for (const c of b.title) h = (h * 31 + c.charCodeAt(0)) >>> 0
   return `<span class="cv gen" style="--h:${HUES[h % HUES.length]}" aria-hidden="true"><span class="serif">${esc(b.title)}</span><small>${esc((b.author || '').split(',')[0])}</small></span>`
 }
@@ -241,6 +245,17 @@ function autoLink(rec, pages) {
 function linkTo(rec, bibId) {
   rec.bibId = bibId || null
   db.update('books', rec.id, { bibId: rec.bibId })
+  shareCover(rec)
+}
+
+// Copy the file's cover into Bibliotheca (as a small inline image) when its entry has none.
+async function shareCover(rec) {
+  const bib = rec.bibId && rec.cover && bridge.find(rec.bibId)
+  if (!bib || bib.cover) return
+  const small = await thumbnail(rec.cover, 200, .72)
+  if (!small) return
+  const url = await new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result); f.onerror = () => r(''); f.readAsDataURL(small) })
+  try { bridge.setCover(rec.bibId, url) } catch {} // storage full: keep the placeholder
 }
 
 function askForFile(entry) {

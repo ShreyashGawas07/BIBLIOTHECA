@@ -18,6 +18,11 @@ const render = async (page, doc, zoom) => {
     doc.documentElement.style.transformOrigin = 'top left'
     doc.documentElement.style.setProperty('--scale-factor', scale)
     const viewport = page.getViewport({ scale })
+    // local patch (book reader): stretch the current canvas to the new size at once, so a zoom
+    // never shows the page shrunk or jumping while the sharp one renders; drop stale renders
+    const id = doc.__renderId = (doc.__renderId || 0) + 1
+    const old = doc.querySelector('#canvas canvas')
+    if (old) Object.assign(old.style, { width: `${viewport.width}px`, height: `${viewport.height}px` })
 
     // the canvas must be in the `PDFDocument`'s `ownerDocument`
     // (`globalThis.document` by default); that's where the fonts are loaded
@@ -26,9 +31,11 @@ const render = async (page, doc, zoom) => {
     canvas.width = viewport.width
     const canvasContext = canvas.getContext('2d')
     await page.render({ canvasContext, viewport }).promise
+    if (id !== doc.__renderId) return
     doc.querySelector('#canvas').replaceChildren(doc.adoptNode(canvas))
 
     const container = doc.querySelector('.textLayer')
+    container.replaceChildren() // local patch (book reader): don't stack a new text layer per zoom
     const textLayer = new pdfjsLib.TextLayer({
         textContentSource: await page.streamTextContent(),
         container, viewport,
@@ -57,6 +64,7 @@ const render = async (page, doc, zoom) => {
     container.onpointerup = () => container.classList.remove('selecting')
 
     const div = doc.querySelector('.annotationLayer')
+    div.replaceChildren() // local patch (book reader)
     const linkService = {
         goToDestination: () => {},
         getDestinationHash: dest => JSON.stringify(dest),

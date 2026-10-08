@@ -86,14 +86,14 @@ export async function fingerprint(file) {
   return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-export async function thumbnail(blob, width = 360) {
+export async function thumbnail(blob, width = 360, quality = .82) {
   try {
     const bmp = await createImageBitmap(blob)
     const scale = Math.min(1, width / bmp.width)
     const c = new OffscreenCanvas(Math.round(bmp.width * scale), Math.round(bmp.height * scale))
     c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height)
     bmp.close()
-    return await c.convertToBlob({ type: 'image/jpeg', quality: .82 })
+    return await c.convertToBlob({ type: 'image/jpeg', quality })
   } catch { return null }
 }
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <!-- Books can contain scripts; this policy blocks them (blob: book pages inherit it). No network calls leave this site. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' blob:; img-src 'self' blob: data:; font-src 'self' blob: data:; media-src 'self' blob: data:; frame-src blob:; connect-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' blob:; img-src 'self' blob: data: https:; font-src 'self' blob: data:; media-src 'self' blob: data:; frame-src blob:; connect-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>Reader · Bibliotheca</title>
 <meta name="description" content="A quiet reader for your own books, linked to Bibliotheca.">
@@ -37,6 +37,7 @@
   <div id="chrome-bot" class="chrome bot"></div>
   <div id="banner" hidden role="status"></div>
   <div id="selbar" hidden></div>
+  <div id="pen" hidden></div>
   <div id="loading" hidden role="status" aria-live="polite"><div class="ld"><span class="serif" id="ld-t"></span><span class="p"><i id="ld-p"></i></span></div></div>
 </section>
 

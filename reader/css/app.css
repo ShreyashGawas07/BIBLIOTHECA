@@ -142,6 +142,21 @@ body.chrome-on .chrome { opacity: 1; visibility: visible; transform: translate(-
 .dot::before { content: ""; width: 26px; height: 26px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px #0002; transition: transform .15s; }
 .dot.on::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; border: 2px solid var(--ink); }
 .dot:active::before { transform: scale(.88); }
+/* highlight pen */
+#pen { position: fixed; right: max(14px, env(safe-area-inset-right)); bottom: calc(env(safe-area-inset-bottom) + 18px); z-index: 6; display: flex; align-items: center; gap: 6px; transition: bottom .25s cubic-bezier(.2, .8, .2, 1); }
+body.reading.chrome-on #pen { bottom: calc(env(safe-area-inset-bottom) + 150px); }
+#selbar:not([hidden]) ~ #pen { display: none; }
+.pen-btn { width: 48px; height: 48px; border-radius: 50%; border: 0; display: grid; place-items: center; background: var(--card); color: var(--mut); box-shadow: var(--shadow); opacity: .55; transition: opacity .2s, background .2s, color .2s, transform .15s; }
+.pen-btn:hover, .pen-btn:focus-visible { opacity: 1; }
+.pen-btn:active { transform: scale(.92); }
+#pen.on .pen-btn { opacity: 1; background: var(--c); color: #1b1b1b; }
+.pen-opts { display: flex; align-items: center; gap: 2px; padding: 2px 6px; border-radius: 99px; background: var(--card); box-shadow: var(--shadow); animation: penin .18s ease-out; }
+.pen-opts .sep { width: 1px; height: 24px; background: var(--line); margin: 0 2px; }
+.pen-opts .dot { width: 40px; height: 44px; }
+.pen-opts .dot::before { width: 22px; height: 22px; }
+@keyframes penin { from { opacity: 0; transform: translateX(12px); } }
+@media (max-width: 360px) { .pen-opts .dot { width: 34px; } }
+
 @keyframes rise { from { transform: translate(-50%, 12px); opacity: 0; } }
 
 #loading { position: absolute; inset: 0; display: grid; place-items: center; background: var(--bg); z-index: 7; }
@@ -267,3 +282,4 @@ blockquote.quote { margin: 4px 0 6px; padding: 2px 0 2px 14px; border-left: 3px 
 body.reading.chrome-on #toast { bottom: calc(env(safe-area-inset-bottom) + 158px); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+body.reading.pen-on:not(.chrome-on) #toast { bottom: calc(env(safe-area-inset-bottom) + 84px); }

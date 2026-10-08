@@ -41,7 +41,9 @@ export async function initHighlights(ctx) {
     else if (h.style === 'squiggly') draw(Overlayer.squiggly, { color, width: 2 })
     else draw(Overlayer.highlight, { color })
   })
+  let lastStroke = 0
   view.addEventListener('show-annotation', ({ detail: { value } }) => {
+    if (Date.now() - lastStroke < 600) return // the click that ends a pen stroke
     const h = byCfi().get(value)
     if (h) editSheet(h)
   })
@@ -104,7 +106,82 @@ export async function initHighlights(ctx) {
       }, 220)
     })
   }
-  view.addEventListener('load', ({ detail: { doc, index } }) => watchDoc(doc, index))
+  // sections can finish loading while we read the database, so take those as well
+  const seen = new WeakSet()
+  const attach = ({ doc, index }) => { if (!doc || seen.has(doc)) return; seen.add(doc); watchDoc(doc, index); penDoc(doc, index) }
+  view.addEventListener('load', e => attach(e.detail))
+
+  // ---------- pen mode ----------
+  // With the pen on, a finger drag paints a highlight straight away. The browser's own text selection
+  // is off, so Chrome's search panel and copy menu never cover the page.
+  const pen = $('#pen')
+  let penOn = false
+  const docs = new Set()
+  function penDoc(doc, index) {
+    docs.add(doc)
+    const st = doc.createElement('style')
+    st.textContent = `html.pen, html.pen * { -webkit-user-select: none !important; user-select: none !important; -webkit-touch-callout: none !important; touch-action: none !important; cursor: text; }
+      ::highlight(pen) { background-color: var(--pen, #e9b73066); }`
+    doc.head?.append(st)
+    doc.documentElement.classList.toggle('pen', penOn)
+    let start = null, range = null
+    const paint = () => {
+      const H = doc.defaultView.Highlight, reg = doc.defaultView.CSS?.highlights
+      if (!H || !reg) return
+      if (range) reg.set('pen', new H(range)); else reg.delete('pen')
+    }
+    doc.addEventListener('pointerdown', e => {
+      if (!penOn || e.button > 0 || !e.isPrimary) return
+      start = caretAt(doc, e.clientX, e.clientY); range = null
+      doc.documentElement.style.setProperty('--pen', COLORS[prefs.get().hlColor].hex + '66')
+    })
+    doc.addEventListener('pointermove', e => {
+      if (!penOn || !start) return
+      const end = caretAt(doc, e.clientX, e.clientY)
+      if (!end) return
+      range = wordRange(doc, start, end); paint()
+    })
+    const finish = async e => {
+      if (!start) return
+      const r = range; start = range = null; paint()
+      if (r) lastStroke = Date.now()
+      if (e.type === 'pointercancel' || !r || !r.toString().trim()) return
+      pending = { doc, index, range: r }
+      await create(prefs.get().hlColor)
+    }
+    doc.addEventListener('pointerup', finish)
+    doc.addEventListener('pointercancel', finish)
+    // a tap with the pen on shouldn't open the controls or turn the page
+    doc.addEventListener('click', e => { if (penOn && !e.target.closest?.('a[href]')) e.preventDefault() }, true)
+  }
+
+  function renderPen() {
+    const p = prefs.get()
+    pen.classList.toggle('on', penOn)
+    pen.innerHTML = `${penOn ? `<div class="pen-opts" role="group" aria-label="Pen colour and style">
+        ${Object.entries(COLORS).map(([k, c]) => `<button type="button" class="dot ${p.hlColor === k ? 'on' : ''}" data-c="${k}" style="--c:${c.hex}" aria-label="${c.label}" aria-pressed="${p.hlColor === k}"></button>`).join('')}
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" class="ib sty" data-s aria-label="Style: ${STYLES[p.hlStyle].label}. Tap to change">${styleGlyph(p.hlStyle)}</button>
+      </div>` : ''}
+      <button type="button" class="pen-btn" data-pen aria-pressed="${penOn}" aria-label="${penOn ? 'Pen on: drag over text to highlight. Tap to turn off' : 'Highlight pen'}" style="--c:${COLORS[p.hlColor].hex}">${icon('pen', 22)}</button>`
+    pen.querySelector('[data-pen]').onclick = () => setPen(!penOn)
+    pen.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { prefs.set({ hlColor: b.dataset.c }); renderPen() })
+    pen.querySelector('[data-s]')?.addEventListener('click', () => {
+      const keys = Object.keys(STYLES); prefs.set({ hlStyle: keys[(keys.indexOf(prefs.get().hlStyle) + 1) % keys.length] }); renderPen()
+    })
+  }
+  function setPen(on) {
+    penOn = on
+    for (const d of docs) { if (!d.defaultView) { docs.delete(d); continue } d.documentElement.classList.toggle('pen', on); d.getSelection()?.removeAllRanges() }
+    hideBar()
+    document.body.classList.toggle('pen-on', on)
+    ctx.onPen?.(on)
+    renderPen()
+    if (on) toast('Drag over text to highlight')
+  }
+  pen.hidden = false
+  renderPen()
+  for (const c of view.renderer.getContents?.() ?? []) attach(c)
 
   // ---------- edit sheet ----------
   function editSheet(h) {
@@ -164,8 +241,29 @@ export async function initHighlights(ctx) {
     remove,
     edit: editSheet,
     hideBar,
+    penOn: () => penOn,
+    destroy() { penOn = false; document.body.classList.remove('pen-on'); pen.hidden = true; pen.innerHTML = '' },
     async reload() { items = await db.byBook('highlights', bookId) },
   }
+}
+
+// caret position under a point, skipping our own UI
+function caretAt(doc, x, y) {
+  const r = doc.caretRangeFromPoint?.(x, y)
+  if (r) return { node: r.startContainer, offset: r.startOffset }
+  const p = doc.caretPositionFromPoint?.(x, y)
+  return p ? { node: p.offsetNode, offset: p.offset } : null
+}
+// range between two carets, in document order, widened to whole words
+function wordRange(doc, a, b) {
+  const r = doc.createRange()
+  r.setStart(a.node, a.offset); r.setEnd(a.node, a.offset)
+  if (r.comparePoint(b.node, b.offset) < 0) r.setStart(b.node, b.offset); else r.setEnd(b.node, b.offset)
+  const isW = c => /[\p{L}\p{N}'’-]/u.test(c)
+  const sc = r.startContainer, ec = r.endContainer
+  if (sc.nodeType === 3) { let o = r.startOffset; while (o > 0 && isW(sc.data[o - 1])) o--; r.setStart(sc, o) }
+  if (ec.nodeType === 3) { let o = r.endOffset; while (o < ec.data.length && isW(ec.data[o])) o++; r.setEnd(ec, o) }
+  return r
 }
 
 export function styleGlyph(style) {

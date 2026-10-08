@@ -53,6 +53,13 @@ export function retitle(id, oldTitle, title, author) {
   b.upd = Date.now(); write(D)
 }
 
+// Give a Bibliotheca entry the book's own cover, unless it already has one (from search or set by you).
+export function setCover(id, url) {
+  const D = read(); const b = D?.books?.find(x => x.id === id)
+  if (!b || b.cover || !url) return
+  b.cover = url; b.upd = Date.now(); write(D)
+}
+
 export function setTotal(id, total) {
   const D = read(); const b = D?.books?.find(x => x.id === id)
   if (!b || !total || b.total) return
