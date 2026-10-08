@@ -22,6 +22,7 @@ const P = {
   zoom: '<circle cx="9" cy="9" r="5"/><path d="m13 13 4 4M7 9h4"/>',
   sun: '<circle cx="10" cy="10" r="3.2"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/>',
   copy: '<rect x="7" y="7" width="9" height="10" rx="1.5"/><path d="M4 13V4.5A1.5 1.5 0 0 1 5.5 3H12"/>',
+  eraser: '<path d="M8.5 16.5 3.8 11.8a1.5 1.5 0 0 1 0-2.1l6.4-6.4a1.5 1.5 0 0 1 2.1 0l4.4 4.4a1.5 1.5 0 0 1 0 2.1l-6.9 6.7zM6.5 8l6 6M8.5 16.5H17"/>',
   trash: '<path d="M4 6h12M8 6V4h4v2M6 6l.8 10.5h6.4L14 6"/>',
   pen: '<path d="M4 16l1-4 8.5-8.5 3 3L8 15z"/>',
   library: '<rect x="3" y="3" width="4" height="14"/><rect x="8" y="3" width="4" height="14"/><path d="m13 4 4 1-3 12-4-1"/>',

@@ -153,9 +153,11 @@ body.reading.chrome-on #pen { bottom: calc(env(safe-area-inset-bottom) + 150px);
 .pen-opts { display: flex; align-items: center; gap: 2px; padding: 2px 6px; border-radius: 99px; background: var(--card); box-shadow: var(--shadow); animation: penin .18s ease-out; }
 .pen-opts .sep { width: 1px; height: 24px; background: var(--line); margin: 0 2px; }
 .pen-opts .dot { width: 40px; height: 44px; }
+.pen-opts .ib.on { background: var(--ink); color: var(--bg); border-radius: 50%; }
+#pen.erasing .pen-btn { background: var(--ink); color: var(--bg); }
 .pen-opts .dot::before { width: 22px; height: 22px; }
 @keyframes penin { from { opacity: 0; transform: translateX(12px); } }
-@media (max-width: 360px) { .pen-opts .dot { width: 34px; } }
+@media (max-width: 400px) { .pen-opts .dot { width: 34px; } .pen-opts .ib { width: 40px; } }
 
 @keyframes rise { from { transform: translate(-50%, 12px); opacity: 0; } }
 

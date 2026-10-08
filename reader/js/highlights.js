@@ -45,7 +45,8 @@ export async function initHighlights(ctx) {
   view.addEventListener('show-annotation', ({ detail: { value } }) => {
     if (Date.now() - lastStroke < 600) return // the click that ends a pen stroke
     const h = byCfi().get(value)
-    if (h) editSheet(h)
+    if (h && tool === 'eraser') remove(h.id)
+    else if (h) editSheet(h)
   })
 
   // ---------- selection toolbar ----------
@@ -89,7 +90,6 @@ export async function initHighlights(ctx) {
     doc.getSelection().removeAllRanges()
     hideBar()
     ctx.onChange()
-    toast('Highlighted', { action: 'Undo', onAction: () => remove(h.id) })
     return h
   }
 
@@ -116,6 +116,7 @@ export async function initHighlights(ctx) {
   // is off, so Chrome's search panel and copy menu never cover the page.
   const pen = $('#pen')
   let penOn = false
+  let tool = 'pen' // 'pen' paints, 'eraser' removes the highlight you tap
   const docs = new Set()
   function penDoc(doc, index) {
     docs.add(doc)
@@ -131,12 +132,14 @@ export async function initHighlights(ctx) {
       if (range) reg.set('pen', new H(range)); else reg.delete('pen')
     }
     doc.addEventListener('pointerdown', e => {
-      if (!penOn || e.button > 0 || !e.isPrimary) return
+      if (!penOn || tool !== 'pen' || e.button > 0 || !e.isPrimary) return
       start = caretAt(doc, e.clientX, e.clientY); range = null
+      if (start) start.at = [e.clientX, e.clientY]
       doc.documentElement.style.setProperty('--pen', COLORS[prefs.get().hlColor].hex + '66')
     })
     doc.addEventListener('pointermove', e => {
       if (!penOn || !start) return
+      if (!range && Math.hypot(e.clientX - start.at[0], e.clientY - start.at[1]) < 10) return // a tap, not a stroke
       const end = caretAt(doc, e.clientX, e.clientY)
       if (!end) return
       range = wordRange(doc, start, end); paint()
@@ -157,27 +160,28 @@ export async function initHighlights(ctx) {
 
   function renderPen() {
     const p = prefs.get()
-    pen.classList.toggle('on', penOn)
+    pen.classList.toggle('on', penOn); pen.classList.toggle('erasing', penOn && tool === 'eraser')
     pen.innerHTML = `${penOn ? `<div class="pen-opts" role="group" aria-label="Pen colour and style">
-        ${Object.entries(COLORS).map(([k, c]) => `<button type="button" class="dot ${p.hlColor === k ? 'on' : ''}" data-c="${k}" style="--c:${c.hex}" aria-label="${c.label}" aria-pressed="${p.hlColor === k}"></button>`).join('')}
+        ${Object.entries(COLORS).map(([k, c]) => `<button type="button" class="dot ${tool === 'pen' && p.hlColor === k ? 'on' : ''}" data-c="${k}" style="--c:${c.hex}" aria-label="${c.label}" aria-pressed="${tool === 'pen' && p.hlColor === k}"></button>`).join('')}
         <span class="sep" aria-hidden="true"></span>
+        <button type="button" class="ib ${tool === 'eraser' ? 'on' : ''}" data-e aria-pressed="${tool === 'eraser'}" aria-label="Eraser: tap a highlight to remove it">${icon('eraser')}</button>
         <button type="button" class="ib sty" data-s aria-label="Style: ${STYLES[p.hlStyle].label}. Tap to change">${styleGlyph(p.hlStyle)}</button>
       </div>` : ''}
       <button type="button" class="pen-btn" data-pen aria-pressed="${penOn}" aria-label="${penOn ? 'Pen on: drag over text to highlight. Tap to turn off' : 'Highlight pen'}" style="--c:${COLORS[p.hlColor].hex}">${icon('pen', 22)}</button>`
     pen.querySelector('[data-pen]').onclick = () => setPen(!penOn)
-    pen.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { prefs.set({ hlColor: b.dataset.c }); renderPen() })
+    pen.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { tool = 'pen'; prefs.set({ hlColor: b.dataset.c }); renderPen() })
+    pen.querySelector('[data-e]')?.addEventListener('click', () => { tool = tool === 'eraser' ? 'pen' : 'eraser'; renderPen() })
     pen.querySelector('[data-s]')?.addEventListener('click', () => {
-      const keys = Object.keys(STYLES); prefs.set({ hlStyle: keys[(keys.indexOf(prefs.get().hlStyle) + 1) % keys.length] }); renderPen()
+      tool = 'pen'; const keys = Object.keys(STYLES); prefs.set({ hlStyle: keys[(keys.indexOf(prefs.get().hlStyle) + 1) % keys.length] }); renderPen()
     })
   }
   function setPen(on) {
-    penOn = on
+    penOn = on; tool = 'pen'
     for (const d of docs) { if (!d.defaultView) { docs.delete(d); continue } d.documentElement.classList.toggle('pen', on); d.getSelection()?.removeAllRanges() }
     hideBar()
     document.body.classList.toggle('pen-on', on)
     ctx.onPen?.(on)
     renderPen()
-    if (on) toast('Drag over text to highlight')
   }
   pen.hidden = false
   renderPen()
